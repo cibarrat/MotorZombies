@@ -74,4 +74,6 @@ crashlytics-build.properties
 
 # Default scenes
 /[Aa]ssets/Scenes/Playground.unity
+/[Aa]ssets/Scenes/Playground.unity.meta
 /[Aa]ssets/Scenes/SampleScene.unity
+/[Aa]ssets/Scenes/SampleScene.unity.meta
