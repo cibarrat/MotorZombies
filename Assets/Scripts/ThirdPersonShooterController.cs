@@ -3,32 +3,190 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 using StarterAssets;
+using UnityEngine.UI;
+using UnityEngine.InputSystem;
+using Unity.VisualScripting;
 
 public class ThirdPersonShooterController : MonoBehaviour
 {
     [SerializeField] private CinemachineVirtualCamera aimVirtualCamera;
+    [SerializeField] private CinemachineVirtualCamera followVirtualCamera;
     [SerializeField] private float normalSensitivity;
     [SerializeField] private float aimSensitivity;
+    [SerializeField] private GameObject crosshair;
+    [SerializeField] private GameObject obstacleCrosshair;
+    [SerializeField] private LayerMask aimColliderLayerMask = new LayerMask();
+    [SerializeField] private Transform spawnBulletPosition;
+    [SerializeField] private GameObject bulletHolePrefab;
+    [SerializeField] private AudioClip gunFire;
+    public float focusTime = 0.5f;
+    public float shootRate = 0.5f;
+    public float unfocusedCrosshairRadius = 0.5f;
+    public float focusedCrosshairRadius = 0.1f;
 
     private StarterAssetsInputs starterAssetsInputs;
     private ThirdPersonController thirdPersonController;
+    private bool crosshairFocused = false;
+    private bool currentSide = true;
+    private float shootRateTimeout = 0f;
+
+    Coroutine focusCoroutine = null;
 
     private void Awake()
     {
         starterAssetsInputs = GetComponent<StarterAssetsInputs>(); 
-        thirdPersonController = GetComponent<ThirdPersonController>(); 
+        thirdPersonController = GetComponent<ThirdPersonController>();
     }
 
     private void Update()
     {
+        SwitchAimSide();
         if (starterAssetsInputs.aim)
         {
+            Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
+            thirdPersonController.SetCanRun(false);
+            if (shootRateTimeout > 0f)
+            {
+                shootRateTimeout -= Time.deltaTime;
+            }
             aimVirtualCamera.gameObject.SetActive(true);
+            crosshair.SetActive(true);
+            thirdPersonController.SetRotateOnMove(false);
             thirdPersonController.SetSensitivity(aimSensitivity);
+            if (!crosshairFocused && starterAssetsInputs.move == Vector2.zero && focusCoroutine == null)
+            {
+                focusCoroutine = StartCoroutine(FocusCrosshair(focusTime)); 
+            } else if (crosshairFocused && starterAssetsInputs.move != Vector2.zero)
+            {
+                UnfocusCrosshair();
+            }
+            // Sub Crosshair Aim
+            GenerateSubCrosshair();
+            float shootArea = crosshairFocused ? focusedCrosshairRadius : unfocusedCrosshairRadius;
+            Vector2 shotVariation = new Vector2(Random.Range(-shootArea, shootArea), Random.Range(-shootArea, shootArea));
+            
+            // Aim point
+            Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint + shotVariation);
+            if (Physics.Raycast(ray, out RaycastHit raycastHit, 999f, aimColliderLayerMask))
+            {
+                Vector3 mouseWorldPosition = raycastHit.point;
+                Vector3 worldAimTarget = mouseWorldPosition;
+                worldAimTarget.y = transform.position.y;
+                Vector3 aimDirection = (worldAimTarget - transform.position).normalized;
+                
+                transform.forward = Vector3.Lerp(transform.forward, aimDirection, Time.deltaTime * 20f);
+                Vector3 shootAimDirection = (mouseWorldPosition - spawnBulletPosition.position).normalized;
+                // Shoot
+                Shoot(shootAimDirection);
+            }
         } else
         {
+            thirdPersonController.SetCanRun(true);
+            thirdPersonController.SetRotateOnMove(true);
             aimVirtualCamera.gameObject.SetActive(false);
+            crosshair.SetActive(false);
+            obstacleCrosshair.SetActive(false);
             thirdPersonController.SetSensitivity(normalSensitivity);
+            
+            UnfocusCrosshair();
+        }
+        if(starterAssetsInputs.move != Vector2.zero && focusCoroutine != null)
+        {
+            UnfocusCrosshair();
+        }
+    }
+
+    private void Shoot(Vector3 shootAimDirection)
+    {
+        if (starterAssetsInputs.shoot && shootRateTimeout <= 0f && Physics.Raycast(spawnBulletPosition.position, shootAimDirection, out RaycastHit hitInfo, 999f, aimColliderLayerMask))
+        {
+            AudioSource.PlayClipAtPoint(gunFire, spawnBulletPosition.position);
+            GameObject bulletHole = Instantiate(bulletHolePrefab, hitInfo.point + hitInfo.normal * 0.01f, Quaternion.identity);
+            shootRateTimeout = shootRate;
+            UnfocusCrosshair();
+            bulletHole.transform.rotation = Quaternion.LookRotation(hitInfo.normal);
+            bulletHole.transform.SetParent(hitInfo.collider.transform);
+            GameObject.Destroy(bulletHole, 5);
+        }
+    }
+    private IEnumerator FocusCrosshair(float time)
+    {
+        yield return new WaitForSeconds(time);
+        if (starterAssetsInputs.aim && !crosshairFocused && starterAssetsInputs.move == Vector2.zero)
+        {
+            Transform[] crosshairs = crosshair.GetComponentsInChildren<Transform>();
+            crosshairFocused = true;
+            for (int i = 0; i < crosshairs.Length; i++)
+            {
+                crosshairs[i].localPosition *= 0.5f; 
+            }
+        } else
+        {
+            focusCoroutine = null;
+        }
+    }
+
+    private void GenerateSubCrosshair()
+    {
+        Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
+        Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint);
+        if (Physics.Raycast(ray, out RaycastHit staticRaycastHit, 999f, aimColliderLayerMask))
+        {
+            Vector3 shootAimDirection = (staticRaycastHit.point - spawnBulletPosition.position).normalized;
+            if (Physics.Raycast(spawnBulletPosition.position, shootAimDirection, out RaycastHit hitInfo, 999f, aimColliderLayerMask))
+            {
+                Vector3 screenPosition = Camera.main.WorldToScreenPoint(hitInfo.point);
+                RectTransform obstacleTransform = obstacleCrosshair.GetComponent<RectTransform>();
+                obstacleTransform.anchoredPosition = new Vector2(
+                        screenPosition.x - (Screen.width / 2),
+                        screenPosition.y - (Screen.height / 2)
+                    );
+                if (Mathf.Abs(obstacleTransform.anchoredPosition.x) > 30 && Mathf.Abs(obstacleTransform.anchoredPosition.y) > 30)
+                {
+                    obstacleCrosshair.SetActive(true);
+                }
+                else
+                {
+                    obstacleCrosshair.SetActive(false);
+                }
+            }
+        }
+    }
+    private void UnfocusCrosshair()
+    {
+        if (focusCoroutine != null)
+        {
+            StopCoroutine(focusCoroutine);
+            focusCoroutine = null;
+        }
+        if (crosshairFocused)
+        {
+            Transform[] crosshairs = crosshair.GetComponentsInChildren<Transform>();
+            crosshairFocused = false;
+            for (int i = 0; i < crosshairs.Length; i++)
+            {
+                crosshairs[i].localPosition *= 2f;
+            }
+        }
+    }
+
+    private void SwitchAimSide()
+    {
+        if (starterAssetsInputs.switchSides)
+        {
+            if (currentSide)
+            {
+                bool cameraSide = aimVirtualCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraSide == 1;
+                Cinemachine3rdPersonFollow aimCameraFollow = aimVirtualCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
+                aimCameraFollow.CameraSide = !cameraSide ? 1 : 0;
+                Cinemachine3rdPersonFollow followCameraFollow = followVirtualCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
+                followCameraFollow.CameraSide = !cameraSide ? 1 : 0;
+                //spawnBulletPosition.localPosition = new Vector3(spawnBulletPosition.localPosition.x * -1, spawnBulletPosition.localPosition.y, spawnBulletPosition.localPosition.z);
+                currentSide = false;
+            }
+        } else
+        {
+            currentSide = true;
         }
     }
 }
