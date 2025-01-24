@@ -57,6 +57,10 @@ namespace StarterAssets
         {
             ShootInput(value.isPressed);
         }
+        public void OnPause(InputValue value)
+        {
+            PauseInput(value.isPressed);
+        }
         public void OnSwitchSides(InputValue value)
         {
             SwitchSidesInput(value.isPressed);
@@ -94,6 +98,10 @@ namespace StarterAssets
         public void ShootInput(bool newShootState)
         {
             shoot = newShootState;
+        }
+        public void PauseInput(bool newPauseState)
+        {
+            pause = newPauseState;
         }
         public void PauseInput(bool newPauseState)
         {

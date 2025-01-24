@@ -45,7 +45,7 @@
                     "name": "Aim",
                     "type": "PassThrough",
                     "id": "4b648c1d-d953-4264-8adf-0c1a0c4168aa",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -57,7 +57,7 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
-                    "initialStateCheck": false
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Switch Sides",
@@ -71,7 +71,7 @@
                 {
                     "name": "Pause",
                     "type": "PassThrough",
-                    "id": "b2912510-703e-4328-ba52-64c1a90f65de",
+                    "id": "e8b1d3be-63f5-4b91-beb0-02f9cc5c0faa",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -247,7 +247,7 @@
                 {
                     "name": "",
                     "id": "c8fcd86e-dcfd-4f88-8e93-b638cdbf3320",
-                    "path": "<Gamepad>/leftShoulder",
+                    "path": "<Gamepad>/leftTrigger",
                     "interactions": "",
                     "processors": "",
                     "groups": "Gamepad",
@@ -323,7 +323,7 @@
                 },
                 {
                     "name": "",
-                    "id": "81d482b0-1ee1-4358-a0b6-6051abacc1d9",
+                    "id": "2112b51c-04bd-4f72-bec6-53642c19acf2",
                     "path": "<Keyboard>/p",
                     "interactions": "",
                     "processors": "",
@@ -334,7 +334,7 @@
                 },
                 {
                     "name": "",
-                    "id": "8e37fba8-1605-4b18-9d9d-9e8e9ce0e1e3",
+                    "id": "0dda4100-834b-4aef-a737-5d8e3e6dac1f",
                     "path": "<Gamepad>/start",
                     "interactions": "",
                     "processors": "",
