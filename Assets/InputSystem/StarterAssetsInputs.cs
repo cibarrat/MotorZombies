@@ -65,10 +65,6 @@ namespace StarterAssets
         {
             SwitchSidesInput(value.isPressed);
         }
-        public void OnPause(InputValue value)
-        {
-            PauseInput(value.isPressed);
-        }
 #endif
 
         public void MoveInput(Vector2 newMoveDirection)
@@ -98,10 +94,6 @@ namespace StarterAssets
         public void ShootInput(bool newShootState)
         {
             shoot = newShootState;
-        }
-        public void PauseInput(bool newPauseState)
-        {
-            pause = newPauseState;
         }
         public void PauseInput(bool newPauseState)
         {
