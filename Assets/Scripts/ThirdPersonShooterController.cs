@@ -26,6 +26,7 @@ public class ThirdPersonShooterController : MonoBehaviour
 
     private StarterAssetsInputs starterAssetsInputs;
     private ThirdPersonController thirdPersonController;
+    private Animator animator;
     private bool crosshairFocused = false;
     private bool currentSide = true;
     private float shootRateTimeout = 0f;
@@ -36,6 +37,7 @@ public class ThirdPersonShooterController : MonoBehaviour
     {
         starterAssetsInputs = GetComponent<StarterAssetsInputs>(); 
         thirdPersonController = GetComponent<ThirdPersonController>();
+        animator = GetComponent<Animator>();
     }
 
     private void Update()
@@ -53,6 +55,7 @@ public class ThirdPersonShooterController : MonoBehaviour
             crosshair.SetActive(true);
             thirdPersonController.SetRotateOnMove(false);
             thirdPersonController.SetSensitivity(aimSensitivity);
+            animator.SetLayerWeight(1, Mathf.Lerp(animator.GetLayerWeight(1), 1f, Time.deltaTime * 10f));//set aim layer 1
             if (!crosshairFocused && starterAssetsInputs.move == Vector2.zero && focusCoroutine == null)
             {
                 focusCoroutine = StartCoroutine(FocusCrosshair(focusTime)); 
@@ -87,7 +90,8 @@ public class ThirdPersonShooterController : MonoBehaviour
             crosshair.SetActive(false);
             obstacleCrosshair.SetActive(false);
             thirdPersonController.SetSensitivity(normalSensitivity);
-            
+            animator.SetLayerWeight(1, Mathf.Lerp(animator.GetLayerWeight(1), 0f, Time.deltaTime * 10f)); //set aim layer to 0 - idle
+
             UnfocusCrosshair();
         }
         if(starterAssetsInputs.move != Vector2.zero && focusCoroutine != null)
