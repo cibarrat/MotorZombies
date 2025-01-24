@@ -2369,7 +2369,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Damping: {x: 0.1, y: 0.25, z: 0.3}
-  ShoulderOffset: {x: 0.27, y: 0.28, z: 0}
+  ShoulderOffset: {x: 0.42, y: 0.28, z: 0}
   VerticalArmLength: 0
   CameraSide: 1
   CameraDistance: 2
@@ -2405,7 +2405,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4410107368094788400}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.27, y: 1.655, z: -2}
+  m_LocalPosition: {x: 0.42, y: 1.655, z: -2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2641,15 +2641,20 @@ MonoBehaviour:
   obstacleCrosshair: {fileID: 0}
   aimColliderLayerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 769
   spawnBulletPosition: {fileID: 2418080051967693768}
   bulletHolePrefab: {fileID: 5112035868809979404, guid: 7ee8ad62227cf5644a82baec9dbe9123,
     type: 3}
   gunFire: {fileID: 8300000, guid: d546c699c86b2fc49a47b072c4cf4e18, type: 3}
+  bloodSplatter: {fileID: 5546061203685830786, guid: eba1b97c62730ae46bb36a70990be12d,
+    type: 3}
+  spineTransform: {fileID: 370372138059026554}
+  neckTransform: {fileID: 370372138457587536}
   focusTime: 1
   shootRate: 0.5
   unfocusedCrosshairRadius: 20
   focusedCrosshairRadius: 0.1
+  shootDamage: 15
 --- !u!114 &6884353443388178828
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2731,6 +2736,7 @@ MonoBehaviour:
   aim: 0
   shoot: 0
   switchSides: 0
+  pause: 0
   analogMovement: 0
   cursorLocked: 1
   cursorInputForLook: 1

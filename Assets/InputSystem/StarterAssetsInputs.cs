@@ -15,6 +15,7 @@ namespace StarterAssets
         public bool aim;
 		public bool shoot;
 		public bool switchSides;
+		public bool pause;
 
         [Header("Movement Settings")]
 		public bool analogMovement;
@@ -60,6 +61,10 @@ namespace StarterAssets
         {
             SwitchSidesInput(value.isPressed);
         }
+        public void OnPause(InputValue value)
+        {
+            PauseInput(value.isPressed);
+        }
 #endif
 
         public void MoveInput(Vector2 newMoveDirection)
@@ -89,6 +94,10 @@ namespace StarterAssets
         public void ShootInput(bool newShootState)
         {
             shoot = newShootState;
+        }
+        public void PauseInput(bool newPauseState)
+        {
+            pause = newPauseState;
         }
 
         private void OnApplicationFocus(bool hasFocus)
