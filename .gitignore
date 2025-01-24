@@ -73,10 +73,11 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # Default scenes
-Assets/Scenes/Playground.unity
-Assets/Scenes/Playground.unity.meta
-Assets/Scenes/SampleScene.unity
-Assets/Scenes/SampleScene.unity.meta
+/[Aa]ssets/Scenes/Playground*
+/[Aa]ssets/Scenes/SampleScene.unity
+/[Aa]ssets/Scenes/SampleScene.unity.meta
 Assets/Character/Models/Player.fbx
 Assets/Character/Models/Player.fbx.meta
+Assets/Models/zombie.fbx
+Assets/Models/zombie.fbx.meta
 Assets/Scenes/Playground.unity

@@ -6,6 +6,7 @@ using StarterAssets;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using Unity.VisualScripting;
+using UnityEditor;
 
 public class ThirdPersonShooterController : MonoBehaviour
 {
@@ -19,10 +20,14 @@ public class ThirdPersonShooterController : MonoBehaviour
     [SerializeField] private Transform spawnBulletPosition;
     [SerializeField] private GameObject bulletHolePrefab;
     [SerializeField] private AudioClip gunFire;
+    [SerializeField] private GameObject bloodSplatter;
+    [SerializeField] Transform spineTransform;
+    [SerializeField] Transform neckTransform;
     public float focusTime = 0.5f;
     public float shootRate = 0.5f;
     public float unfocusedCrosshairRadius = 0.5f;
     public float focusedCrosshairRadius = 0.1f;
+    public float shootDamage = 15;
 
     private StarterAssetsInputs starterAssetsInputs;
     private ThirdPersonController thirdPersonController;
@@ -43,9 +48,14 @@ public class ThirdPersonShooterController : MonoBehaviour
     private void Update()
     {
         SwitchAimSide();
+        Aim();
+    }
+
+    private void Aim()
+    {
+        Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
         if (starterAssetsInputs.aim)
         {
-            Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
             thirdPersonController.SetCanRun(false);
             if (shootRateTimeout > 0f)
             {
@@ -58,8 +68,9 @@ public class ThirdPersonShooterController : MonoBehaviour
             animator.SetLayerWeight(1, Mathf.Lerp(animator.GetLayerWeight(1), 1f, Time.deltaTime * 10f));//set aim layer 1
             if (!crosshairFocused && starterAssetsInputs.move == Vector2.zero && focusCoroutine == null)
             {
-                focusCoroutine = StartCoroutine(FocusCrosshair(focusTime)); 
-            } else if (crosshairFocused && starterAssetsInputs.move != Vector2.zero)
+                focusCoroutine = StartCoroutine(FocusCrosshair(focusTime));
+            }
+            else if (crosshairFocused && starterAssetsInputs.move != Vector2.zero)
             {
                 UnfocusCrosshair();
             }
@@ -67,7 +78,7 @@ public class ThirdPersonShooterController : MonoBehaviour
             GenerateSubCrosshair();
             float shootArea = crosshairFocused ? focusedCrosshairRadius : unfocusedCrosshairRadius;
             Vector2 shotVariation = new Vector2(Random.Range(-shootArea, shootArea), Random.Range(-shootArea, shootArea));
-            
+
             // Aim point
             Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint + shotVariation);
             if (Physics.Raycast(ray, out RaycastHit raycastHit, 999f, aimColliderLayerMask))
@@ -76,14 +87,22 @@ public class ThirdPersonShooterController : MonoBehaviour
                 Vector3 worldAimTarget = mouseWorldPosition;
                 worldAimTarget.y = transform.position.y;
                 Vector3 aimDirection = (worldAimTarget - transform.position).normalized;
-                
+
                 transform.forward = Vector3.Lerp(transform.forward, aimDirection, Time.deltaTime * 20f);
+
+                spineTransform.forward = Vector3.Lerp(spineTransform.forward, aimDirection, Time.deltaTime * 20f);
                 Vector3 shootAimDirection = (mouseWorldPosition - spawnBulletPosition.position).normalized;
                 // Shoot
                 Shoot(shootAimDirection);
             }
-        } else
+        }
+        else
         {
+            Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint);
+            if (Physics.Raycast(ray, out RaycastHit raycastHit, 999f, aimColliderLayerMask))
+            {
+                neckTransform.forward = Vector3.Lerp(neckTransform.forward, raycastHit.point, Time.deltaTime * 20f);
+            }
             thirdPersonController.SetCanRun(true);
             thirdPersonController.SetRotateOnMove(true);
             aimVirtualCamera.gameObject.SetActive(false);
@@ -91,27 +110,42 @@ public class ThirdPersonShooterController : MonoBehaviour
             obstacleCrosshair.SetActive(false);
             thirdPersonController.SetSensitivity(normalSensitivity);
             animator.SetLayerWeight(1, Mathf.Lerp(animator.GetLayerWeight(1), 0f, Time.deltaTime * 10f)); //set aim layer to 0 - idle
-
+            spineTransform.rotation = Quaternion.identity;
             UnfocusCrosshair();
         }
-        if(starterAssetsInputs.move != Vector2.zero && focusCoroutine != null)
+        if (starterAssetsInputs.move != Vector2.zero && focusCoroutine != null)
         {
             UnfocusCrosshair();
         }
     }
-
     private void Shoot(Vector3 shootAimDirection)
     {
+
         if (starterAssetsInputs.shoot && shootRateTimeout <= 0f && Physics.Raycast(spawnBulletPosition.position, shootAimDirection, out RaycastHit hitInfo, 999f, aimColliderLayerMask))
         {
             AudioSource.PlayClipAtPoint(gunFire, spawnBulletPosition.position);
-            GameObject bulletHole = Instantiate(bulletHolePrefab, hitInfo.point + hitInfo.normal * 0.01f, Quaternion.identity);
             shootRateTimeout = shootRate;
+            if (hitInfo.collider.gameObject.CompareTag("Enemy"))
+            {
+                float damage = shootDamage * Random.Range(1, 1.3f);
+                if (crosshairFocused)
+                {
+                    damage *= Random.Range(1.1f, 1.5f);
+                }
+                Instantiate(bloodSplatter, hitInfo.point, Quaternion.identity);
+                hitInfo.collider.gameObject.GetComponentInParent<ZombieController>().Damage(damage, hitInfo.collider);
+            }
+            else
+            {
+                GameObject bulletHole = Instantiate(bulletHolePrefab, hitInfo.point + hitInfo.normal * 0.01f, Quaternion.identity);
+                bulletHole.transform.rotation = Quaternion.LookRotation(hitInfo.normal);
+                bulletHole.transform.SetParent(hitInfo.collider.transform);
+                GameObject.Destroy(bulletHole, 5);
+            }
             UnfocusCrosshair();
-            bulletHole.transform.rotation = Quaternion.LookRotation(hitInfo.normal);
-            bulletHole.transform.SetParent(hitInfo.collider.transform);
-            GameObject.Destroy(bulletHole, 5);
+
         }
+        
     }
     private IEnumerator FocusCrosshair(float time)
     {
@@ -185,7 +219,7 @@ public class ThirdPersonShooterController : MonoBehaviour
                 aimCameraFollow.CameraSide = !cameraSide ? 1 : 0;
                 Cinemachine3rdPersonFollow followCameraFollow = followVirtualCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
                 followCameraFollow.CameraSide = !cameraSide ? 1 : 0;
-                //spawnBulletPosition.localPosition = new Vector3(spawnBulletPosition.localPosition.x * -1, spawnBulletPosition.localPosition.y, spawnBulletPosition.localPosition.z);
+                spawnBulletPosition.localPosition = new Vector3(spawnBulletPosition.localPosition.x * -1, spawnBulletPosition.localPosition.y, spawnBulletPosition.localPosition.z);
                 currentSide = false;
             }
         } else
