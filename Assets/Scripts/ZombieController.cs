@@ -49,6 +49,7 @@ public class ZombieController : MonoBehaviour
     private Camera sight;
     private AudioSource audioSource;
     private Coroutine chaseCoroutine = null;
+    private Coroutine roamCoroutine = null;
     private CharacterController controller;
 
     private void Awake()
@@ -111,7 +112,7 @@ public class ZombieController : MonoBehaviour
             Vector3 randomPoint = GetRandomPoint(transform.position, roamDistance);
             navMeshAgent.destination = randomPoint;
             isRoaming = true;
-            StartCoroutine(RoamTimeout(Random.Range(1, 15)));
+            roamCoroutine = StartCoroutine(RoamTimeout(Random.Range(1, 15)));
         }
     }
 
@@ -122,30 +123,30 @@ public class ZombieController : MonoBehaviour
             isAttacking = true;
             canMove = false;
             canAttack = false;
+            canRoam = false;
             target.gameObject.GetComponent<PlayerStats>().Damage(attackDamage);
             yield return new WaitForSeconds(attackEndlag);
             canMove = true;
             canAttack = true;
             isAttacking = false;
+            canRoam = true;
         }
     }
 
     private void SeekPlayer()
     {
-        if (!isAttacking)
+        CastRayFromScreenPoint(new Vector2(Screen.width / 2, Screen.height / 2));
+        for (int i = 1; i <= sightRays; i++)
         {
-            CastRayFromScreenPoint(new Vector2(Screen.width / 2, Screen.height / 2));
-            for (int i = 1; i <= sightRays; i++)
-            {
-                // Calcula puntos en la pantalla a izquierda y derecha del centro
-                Vector2 leftScreenPoint = new Vector2((Screen.width / 2) - (i * 50), Screen.height / 2);
-                Vector2 rightScreenPoint = new Vector2((Screen.width / 2) + (i * 50), Screen.height / 2);
+            // Calcula puntos en la pantalla a izquierda y derecha del centro
+            Vector2 leftScreenPoint = new Vector2((Screen.width / 2) - (i * 50), Screen.height / 2);
+            Vector2 rightScreenPoint = new Vector2((Screen.width / 2) + (i * 50), Screen.height / 2);
 
-                // Lanza rayos desde esos puntos
-                CastRayFromScreenPoint(leftScreenPoint);
-                CastRayFromScreenPoint(rightScreenPoint);
-            }
+            // Lanza rayos desde esos puntos
+            CastRayFromScreenPoint(leftScreenPoint);
+            CastRayFromScreenPoint(rightScreenPoint);
         }
+        
     }
 
     void CastRayFromScreenPoint(Vector2 screenPoint)
@@ -164,6 +165,11 @@ public class ZombieController : MonoBehaviour
                 {
                     StopCoroutine(chaseCoroutine);
                     chaseCoroutine = null;
+                }
+                if (roamCoroutine != null)
+                {
+                    StopCoroutine (roamCoroutine);
+                    roamCoroutine = null;
                 }
                 seesPlayer = true;
                 isRoaming = false;
@@ -197,6 +203,7 @@ public class ZombieController : MonoBehaviour
             HP -= damage;
             if (HP < 0)
             {
+                StopAllCoroutines();
                 chanceOfGrunt = 1;
                 canMove = false;
                 canAttack = false;
@@ -208,14 +215,22 @@ public class ZombieController : MonoBehaviour
                 audioSource.Stop();
                 audioSource.PlayOneShot(hurtAudio);
             }
-            else if (!isChasing)
+            if (roamCoroutine != null)
             {
-                playerPosition = GameObject.FindGameObjectWithTag("Player").transform;
-                Rotate(playerPosition.position);
-                isChasing = true;
-                isRoaming = false;
-                canRoam = false;
+                StopCoroutine(roamCoroutine);
+                roamCoroutine = null;
             }
+            if (chaseCoroutine != null)
+            {
+                StopCoroutine (chaseCoroutine);
+                chaseCoroutine = null;
+            }
+            playerPosition = GameObject.FindGameObjectWithTag("Player").transform;
+            Rotate(playerPosition.position);
+            isChasing = true;
+            isRoaming = false;
+            canRoam = false;
+            
         }
     }
 
@@ -244,12 +259,16 @@ public class ZombieController : MonoBehaviour
             }
         }
     }
-
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
         if (canAttack && other.gameObject.CompareTag("Player"))
         {
             Rotate(other.transform.position);
+            if (roamCoroutine != null)
+            {
+                StopCoroutine(roamCoroutine);
+                roamCoroutine = null;
+            }
             StartCoroutine(Attack(other.gameObject));
             audioSource.Stop();
             audioSource.PlayOneShot(attackAudio);
@@ -302,6 +321,7 @@ public class ZombieController : MonoBehaviour
         yield return new WaitForSeconds(time);
         isRoaming = false;
         StartCoroutine(IdleTimeout(Random.Range(0, 10)));
+        roamCoroutine = null;
     }
 
     private IEnumerator IdleTimeout(float time)

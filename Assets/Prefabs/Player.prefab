@@ -2731,6 +2731,8 @@ MonoBehaviour:
   bulletHolePrefab: {fileID: 5112035868809979404, guid: 7ee8ad62227cf5644a82baec9dbe9123,
     type: 3}
   gunFire: {fileID: 8300000, guid: d546c699c86b2fc49a47b072c4cf4e18, type: 3}
+  gunClickSound: {fileID: 8300000, guid: 23e9aaf0feca2804aa6cd1977f67fac2, type: 3}
+  gunReloadSound: {fileID: 0}
   bloodSplatter: {fileID: 5546061203685830786, guid: eba1b97c62730ae46bb36a70990be12d,
     type: 3}
   spineTransform: {fileID: 370372138059026554}

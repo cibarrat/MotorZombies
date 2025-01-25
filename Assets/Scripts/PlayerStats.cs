@@ -38,10 +38,14 @@ public class PlayerStats : MonoBehaviour
         ammoText.text = $"Ammo: {tpsController.LoadedAmmo} | {Ammo}";
         healthText.text = $"Health: {currentHP}";
         medkitsText.text = $"Medkits: {Medkits}";
-        if (inputs.heal && !healPressed && Medkits > 0)
+        if (inputs.heal)
         {
-            healPressed = true;
-            Heal(100);
+            if (!healPressed && Medkits > 0) {
+                healPressed = true;
+                Heal(100);
+                Medkits--;
+                Debug.Log("Healing");
+            }
         } else
         {
             healPressed = false;
@@ -87,6 +91,11 @@ public class PlayerStats : MonoBehaviour
 
     }
 
+    public void Victory()
+    {
+        Debug.Log("You Escaped!");
+    }
+
     public int ReloadAmmo(int quantity)
     {
         int usedAmmo = AmmoCapacity - quantity;
@@ -113,6 +122,12 @@ public class PlayerStats : MonoBehaviour
         {
             Medkits += other.gameObject.GetComponent<ItemHandler>().Quantity;
             GameObject.Destroy(other.gameObject);
+        }
+        if (other.gameObject.CompareTag("Goal"))
+        {
+            tpsController.CanAim = false;
+            tpController.SetCanMove(false);
+            Victory();
         }
     }
 }

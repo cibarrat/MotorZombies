@@ -20,6 +20,8 @@ public class ThirdPersonShooterController : MonoBehaviour
     [SerializeField] private Transform spawnBulletPosition;
     [SerializeField] private GameObject bulletHolePrefab;
     [SerializeField] private AudioClip gunFire;
+    [SerializeField] private AudioClip gunClickSound;
+    [SerializeField] private AudioClip gunReloadSound;
     [SerializeField] private GameObject bloodSplatter;
     [SerializeField] Transform spineTransform;
     [SerializeField] Transform neckTransform;
@@ -135,45 +137,50 @@ public class ThirdPersonShooterController : MonoBehaviour
     }
     private void Shoot(Vector3 shootAimDirection)
     {
-        if (LoadedAmmo > 0 && !isReloading)
+        if (starterAssetsInputs.shoot)
         {
-            if (starterAssetsInputs.shoot && shootRateTimeout <= 0f && Physics.Raycast(spawnBulletPosition.position, shootAimDirection, out RaycastHit hitInfo, 999f, aimColliderLayerMask))
+            if (LoadedAmmo > 0 && !isReloading)
             {
-                AudioSource.PlayClipAtPoint(gunFire, spawnBulletPosition.position);
-                shootRateTimeout = shootRate;
-                if (hitInfo.collider.gameObject.CompareTag("Enemy"))
+                if (shootRateTimeout <= 0f && Physics.Raycast(spawnBulletPosition.position, shootAimDirection, out RaycastHit hitInfo, 999f, aimColliderLayerMask))
                 {
-                    float damage = shootDamage * Random.Range(1, 1.3f);
-                    if (crosshairFocused)
+                    AudioSource.PlayClipAtPoint(gunFire, spawnBulletPosition.position);
+                    shootRateTimeout = shootRate;
+                    if (hitInfo.collider.gameObject.CompareTag("Enemy"))
                     {
-                        damage *= Random.Range(1.1f, 1.5f);
+                        float damage = shootDamage * Random.Range(1, 1.3f);
+                        if (crosshairFocused)
+                        {
+                            damage *= Random.Range(1.1f, 1.5f);
+                        }
+                        Instantiate(bloodSplatter, hitInfo.point, Quaternion.identity);
+                        hitInfo.collider.gameObject.GetComponentInParent<ZombieController>().Damage(damage, hitInfo.collider);
                     }
-                    Instantiate(bloodSplatter, hitInfo.point, Quaternion.identity);
-                    hitInfo.collider.gameObject.GetComponentInParent<ZombieController>().Damage(damage, hitInfo.collider);
+                    else
+                    {
+                        GameObject bulletHole = Instantiate(bulletHolePrefab, hitInfo.point + hitInfo.normal * 0.01f, Quaternion.identity);
+                        bulletHole.transform.rotation = Quaternion.LookRotation(hitInfo.normal);
+                        bulletHole.transform.SetParent(hitInfo.collider.transform);
+                        GameObject.Destroy(bulletHole, 5);
+                    }
+                    UnfocusCrosshair();
+                    LoadedAmmo--;
+                }
+            }
+            else if (shootRateTimeout <= 0f && !isReloading)
+            {
+                shootRateTimeout = shootRate;
+                if (gunClick && ReloadCoroutine == null && stats.Ammo > 0)
+                {
+                    ReloadCoroutine = StartCoroutine(Reload());
                 }
                 else
                 {
-                    GameObject bulletHole = Instantiate(bulletHolePrefab, hitInfo.point + hitInfo.normal * 0.01f, Quaternion.identity);
-                    bulletHole.transform.rotation = Quaternion.LookRotation(hitInfo.normal);
-                    bulletHole.transform.SetParent(hitInfo.collider.transform);
-                    GameObject.Destroy(bulletHole, 5);
+                    AudioSource.PlayClipAtPoint(gunClickSound, spawnBulletPosition.transform.position);
+                    gunClick = true;
                 }
-                UnfocusCrosshair();
-                LoadedAmmo--;
             }
         }
-        else
-        { 
-            if (gunClick && ReloadCoroutine == null)
-            {
-                ReloadCoroutine = StartCoroutine(Reload());
-
-            } else
-            {
-                // Click noise;
-                gunClick = true;
-            }
-        }
+        
     }
 
     private IEnumerator Reload()
