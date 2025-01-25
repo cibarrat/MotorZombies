@@ -52,6 +52,7 @@ public class ZombieController : MonoBehaviour
     private Coroutine chaseCoroutine = null;
     private Coroutine roamCoroutine = null;
     private CharacterController controller;
+    private Animator animator;
 
     private void Awake()
     {
@@ -59,6 +60,7 @@ public class ZombieController : MonoBehaviour
         navMeshAgent = GetComponentInChildren<NavMeshAgent>();
         audioSource = GetComponent<AudioSource>();
         controller = GetComponentInChildren<CharacterController>();
+        animator = GetComponent<Animator>();
     }
 
     private void Update()
@@ -86,6 +88,7 @@ public class ZombieController : MonoBehaviour
         {
             if (seesPlayer)
             {
+                animator.SetTrigger("IsRunning");
                 navMeshAgent.speed = chaseSpeed;
                 navMeshAgent.destination = playerPosition.position;
                 lastPlayerPosition = playerPosition.position;
@@ -110,6 +113,7 @@ public class ZombieController : MonoBehaviour
     {
         if (canMove && canRoam && !isChasing && !isRoaming)
         {
+            animator.SetTrigger("IsRoam");//Roam/Walk animation
             navMeshAgent.speed = speed;
             Vector3 randomPoint = GetRandomPoint(transform.position, roamDistance);
             navMeshAgent.destination = randomPoint;
@@ -122,6 +126,7 @@ public class ZombieController : MonoBehaviour
     {
         if (!isAttacking && canAttack)
         {
+            animator.SetTrigger("IsAttacking");
             isAttacking = true;
             canMove = false;
             canAttack = false;
@@ -186,11 +191,12 @@ public class ZombieController : MonoBehaviour
 
     public void Damage(float damage, Collider hitSpot)
     {
+        
         if (HP > 0)
         {
             float chanceOfGrunt = Random.Range(0f, 1f);
             if (hitSpot.gameObject == weakSpot)
-            {
+            {   //animator.SetTrigger("IsHitStun");
                 damage *= Random.Range(1.5f, 2);
                 chanceOfGrunt *= 1.1f;
             }
