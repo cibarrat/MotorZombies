@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8655249496243152841}
   - component: {fileID: 4644073250549689438}
   - component: {fileID: 945026995492506254}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Highlight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4825,7 +4825,7 @@ GameObject:
   - component: {fileID: 5034101567970338203}
   - component: {fileID: 7421161638178662469}
   - component: {fileID: 6636546047876422811}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Ammo
   m_TagString: Ammo
   m_Icon: {fileID: 0}

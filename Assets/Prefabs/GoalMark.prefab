@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 741559402119579444}
   - component: {fileID: 3291703690819318782}
   - component: {fileID: 5173530830830712056}
-  m_Layer: 0
+  - component: {fileID: 664577228255275745}
+  m_Layer: 2
   m_Name: GoalMark
-  m_TagString: Untagged
+  m_TagString: Goal
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -100,6 +101,19 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 8967326690461673748, guid: 5268200bc6db80845af09eb0823e211e, type: 3}
+--- !u!135 &664577228255275745
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3940235575676572203}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 1.32
+  m_Center: {x: 0, y: 0.45, z: -0.025753528}
 --- !u!1 &6496465497738533419
 GameObject:
   m_ObjectHideFlags: 0
@@ -111,7 +125,7 @@ GameObject:
   - component: {fileID: 3737981497262007253}
   - component: {fileID: 7196188721897503185}
   - component: {fileID: 3827630551808242312}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Highlight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
