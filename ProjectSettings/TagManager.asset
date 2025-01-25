@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - Ammo
   - Medkit
+  - Goal
   layers:
   - Default
   - TransparentFX
