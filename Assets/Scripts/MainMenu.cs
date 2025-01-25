@@ -20,14 +20,18 @@ public class MainMenu : MonoBehaviour
 
     void Start()
     {
+        Time.timeScale = 1f;
         sceneLoadTime = Time.time;
         skipButton.SetActive(true);
     }
     void Update()
     {
+        Debug.Log("time scale" + Time.timeScale);
+        Debug.Log("Time " + Time.time);
         float sceneTime = Time.time - sceneLoadTime;
+        Debug.Log("sceneTime " + sceneTime);
 
-        
+
         if (videoPlayer.isPlaying && videoPlayer.time >= showButtonsTime && !buttonsShown)
         {
             ShowButtons(true);

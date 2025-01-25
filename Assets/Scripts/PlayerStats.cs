@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+using Cinemachine;
+using UnityEngine.SceneManagement;
 
 public class PlayerStats : MonoBehaviour
 {
@@ -14,6 +17,11 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private TextMeshProUGUI healthText;
     [SerializeField] private TextMeshProUGUI medkitsText;
     [SerializeField] private AudioClip playerHurt;
+    [SerializeField] private GameObject canvas;
+    private GameObject CamMovement;
+
+    private CinemachineVirtualCamera virtualCamera;
+    private Image gameoverMenu;
 
     public float Medkits { get; private set; } = 0;
     public int Ammo { get; private set; } = 0;
@@ -21,6 +29,8 @@ public class PlayerStats : MonoBehaviour
     private ThirdPersonShooterController tpsController;
     private ThirdPersonController tpController;
     private StarterAssetsInputs inputs;
+
+
 
     private bool healPressed = false;
 
@@ -30,11 +40,25 @@ public class PlayerStats : MonoBehaviour
         tpController = GetComponent<ThirdPersonController>();
         currentHP = maxHP;
         inputs = GetComponent<StarterAssetsInputs>();
+        Transform imageTransform = canvas.transform.Find("YouDiedMenu");
+        if (imageTransform != null)
+        {
+            gameoverMenu = imageTransform.GetComponent<Image>();
+        }
+    }
+    private void Start()
+    {
+        Time.timeScale = 1f;
+        gameoverMenu.gameObject.SetActive(false);
+
+        CamMovement = GameObject.Find("PlayerFollowCamera");
+        virtualCamera = CamMovement.GetComponent<CinemachineVirtualCamera>();
+        virtualCamera.enabled = true;
     }
 
     private void Update()
     {
-        
+
         ammoText.text = $"Ammo: {tpsController.LoadedAmmo} | {Ammo}";
         healthText.text = $"Health: {currentHP}";
         medkitsText.text = $"Medkits: {Medkits}";
@@ -88,7 +112,11 @@ public class PlayerStats : MonoBehaviour
 
     public void GameOver()
     {
-
+        gameoverMenu.gameObject.SetActive(true);
+        Time.timeScale = 0f;
+        virtualCamera.enabled = false;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     public void Victory()
@@ -129,5 +157,22 @@ public class PlayerStats : MonoBehaviour
             tpController.SetCanMove(false);
             Victory();
         }
+    }
+    public void ChangeScene()
+    {
+
+        Time.timeScale = 1f;
+        Debug.Log("Changing scene to menu");
+        SceneManager.LoadScene("Scenes/MainMenu");
+        gameoverMenu.gameObject.SetActive(false);
+
+    }
+    public void ReloadLevel()
+    {
+
+        Time.timeScale = 1.0f;
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
     }
 }
