@@ -11,7 +11,6 @@ public class InGameSreens : MonoBehaviour
     private StarterAssetsInputs starterAssetsInputs;
     private ThirdPersonController thirdPersonController;
     private bool pauseAux;
-    private GameObject canvasInstance;
     [SerializeField] private GameObject canvas;
     private Image pauseMenu;
     private GameObject CamMovement;
@@ -22,17 +21,8 @@ public class InGameSreens : MonoBehaviour
     {
         starterAssetsInputs = GetComponent<StarterAssetsInputs>();
         thirdPersonController = GetComponent<ThirdPersonController>();
-        if (GameObject.Find("CrosshairCanvas") == null)
-        {
-            Debug.Log("Canvas era nulo");
-            canvasInstance = Instantiate(canvas);
-            Debug.Log("Fue creado");
-        }
-        else
-        {
-            canvasInstance = GameObject.Find("CrosshairCanvas");
-        }
-        Transform imageTransform = canvasInstance.transform.Find("PauseMenu");
+
+        Transform imageTransform = canvas.transform.Find("PauseMenu");
         if (imageTransform != null)
         {
             pauseMenu = imageTransform.GetComponent<Image>();
@@ -80,7 +70,7 @@ public class InGameSreens : MonoBehaviour
     public void ChangeScene()
     {
         Time.timeScale = 1f;
-  
+
         SceneManager.LoadScene("Scenes/MainMenu");
         pauseMenu.gameObject.SetActive(false);
 
