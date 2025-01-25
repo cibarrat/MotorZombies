@@ -6,7 +6,7 @@ public class PlayerChangeArea : MonoBehaviour
 {
     [SerializeField] private GameObject player;
 
-    private void OnTriggerEnter(Collider collision)
+    private void OnTriggerStay(Collider collision)
     {
         if (collision.gameObject.tag == "MainArea")
         {

@@ -4923,4 +4923,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba080e4dfe1eaff43a28d029633edd43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <PickupSound>k__BackingField: {fileID: 8300000, guid: a44652cd9da302448b4c4a073f9c7fad,
+    type: 3}
   Quantity: 10

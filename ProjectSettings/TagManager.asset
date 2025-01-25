@@ -10,6 +10,7 @@ TagManager:
   - Medkit
   - Goal
   - MainArea
+  - Hitbox
   layers:
   - Default
   - TransparentFX
