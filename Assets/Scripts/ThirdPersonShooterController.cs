@@ -79,7 +79,7 @@ public class ThirdPersonShooterController : MonoBehaviour
             thirdPersonController.SetSensitivity(aimSensitivity);
             if (!isReloading)
             {
-                animator.SetLayerWeight(1, Mathf.Lerp(animator.GetLayerWeight(1), 1f, Time.deltaTime * 10f));//set aim layer 1
+                animator.SetLayerWeight(1, Mathf.Lerp(animator.GetLayerWeight(1), 1f, Time.deltaTime * 10f));//set aim layer  to weight 1 aim
             }
             if (!crosshairFocused && starterAssetsInputs.move == Vector2.zero && FocusCoroutine == null)
             {
@@ -141,6 +141,7 @@ public class ThirdPersonShooterController : MonoBehaviour
             {
                 if (shootRateTimeout <= 0f && Physics.Raycast(spawnBulletPosition.position, shootAimDirection, out RaycastHit hitInfo, 999f, aimColliderLayerMask))
                 {
+                    animator.SetTrigger("IsRecoil");//Pistol Recoil animation
                     AudioSource.PlayClipAtPoint(gunFire, spawnBulletPosition.position);
                     shootRateTimeout = shootRate;
                     if (hitInfo.collider.gameObject.CompareTag("Enemy"))
@@ -183,15 +184,19 @@ public class ThirdPersonShooterController : MonoBehaviour
 
     private IEnumerator Reload()
     {
-        //Reload animation
+        
         if (stats.Ammo > 0)
         {
+            animator.SetTrigger("IsReload");//set Bool True <---AQUI ESTA REVISANDO SI AMMO O NO
+            //animator.SetLayerWeight(2, Mathf.Lerp(animator.GetLayerWeight(2), 1f, Time.deltaTime * 10f));//set aim layer 2
             isReloading = true;
             yield return new WaitForSeconds(reloadTime);
             LoadedAmmo = stats.ReloadAmmo(LoadedAmmo);
             gunClick = false;
         }
         isReloading = false;
+        // animator.SetTrigger("IsReload", false); //set Bool False
+       // animator.SetLayerWeight(2, Mathf.Lerp(animator.GetLayerWeight(2), 0f, Time.deltaTime * 10f));//set aim layer 1
         ReloadCoroutine = null;
     }
 

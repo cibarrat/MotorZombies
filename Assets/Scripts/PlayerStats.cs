@@ -89,9 +89,9 @@ public class PlayerStats : MonoBehaviour
 
     public void Damage(float damage)
     {
-        if (isInvincible)
-        {
-            animator.SetBool("IsHit", true);//set Bool True
+       // if (!isInvincible) 
+        //{
+            animator.SetTrigger("IsHit");//Hit Damage Animation
             tpsController.InterruptAimFocus();
             tpsController.InterruptReload();
             StartCoroutine(Hitstun(hitstun));
@@ -99,14 +99,11 @@ public class PlayerStats : MonoBehaviour
             currentHP -= damage;
             if (currentHP <= 0)
             {
-                // Death animation
+                animator.SetTrigger("IsDead");//Death Animation
                 tpController.SetCanMove(false);
                 GameOver();
-            } else
-            {
-                animator.SetBool("IsHit", false);//set Bool false
-            }
-        }
+            } 
+        //}
     }
 
     private IEnumerator Hitstun(float time)
