@@ -65,6 +65,7 @@ public class ZombieController : MonoBehaviour
 
     private void Update()
     {
+        animator.SetFloat("Speed", 0);
         if (debug)
         {
             canMoveText.text = $"canMove: {canMove}";
@@ -79,17 +80,19 @@ public class ZombieController : MonoBehaviour
         SeekPlayer();
         Moan();
         Walk();
-
+    
     }
 
     private void Walk()
     {
+        
         if (canMove && isChasing)
         {
+            navMeshAgent.speed = chaseSpeed;
             if (seesPlayer)
             {
-                animator.SetTrigger("IsRunning");
-                navMeshAgent.speed = chaseSpeed;
+                //animator.SetTrigger("IsRunning");
+                              
                 navMeshAgent.destination = playerPosition.position;
                 lastPlayerPosition = playerPosition.position;
                 //Rotate(navMeshAgent.destination + new Vector3(0, 1, 0), weakSpot.transform);
@@ -108,12 +111,18 @@ public class ZombieController : MonoBehaviour
             }
         }
         Roam();
+        if (canMove)
+        { 
+            animator.SetFloat("Speed", navMeshAgent.speed); 
+        }
+  
     }
     private void Roam()
     {
         if (canMove && canRoam && !isChasing && !isRoaming)
         {
-            animator.SetTrigger("IsRoam");//Roam/Walk animation
+            //animator.SetTrigger("IsRoam");//Roam/Walk animation
+            //animator.speed = navMeshAgent.speed;
             navMeshAgent.speed = speed;
             Vector3 randomPoint = GetRandomPoint(transform.position, roamDistance);
             navMeshAgent.destination = randomPoint;
@@ -196,12 +205,12 @@ public class ZombieController : MonoBehaviour
         {
             float chanceOfGrunt = Random.Range(0f, 1f);
             if (hitSpot.gameObject == weakSpot)
-            {   //animator.SetTrigger("IsHitStun");
-                damage *= Random.Range(1.5f, 2);
+            {   damage *= Random.Range(1.5f, 2);
                 chanceOfGrunt *= 1.1f;
             }
             if (damage >= stunDamageLimit)
-            {
+            {   
+                animator.SetTrigger("IsHitStun");
                 chanceOfGrunt = 1;
                 canAttack = false;
                 canMove = false;
@@ -211,6 +220,7 @@ public class ZombieController : MonoBehaviour
             HP -= damage;
             if (HP < 0)
             {
+                animator.SetTrigger("IsDead");
                 StopAllCoroutines();
                 chanceOfGrunt = 1;
                 canMove = false;
@@ -336,6 +346,7 @@ public class ZombieController : MonoBehaviour
 
     private IEnumerator IdleTimeout(float time)
     {
+       
         yield return new WaitForSeconds(time);
         canRoam = true;
     }
