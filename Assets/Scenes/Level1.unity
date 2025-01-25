@@ -15800,6 +15800,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8088857785731490619, guid: 141b47280ccd5514f9420e505d6f254c,
         type: 3}
+      propertyPath: canvas
+      value: 
+      objectReference: {fileID: 499609860}
+    - target: {fileID: 8088857785731490619, guid: 141b47280ccd5514f9420e505d6f254c,
+        type: 3}
       propertyPath: ammoText
       value: 
       objectReference: {fileID: 1979647264}
@@ -16031,6 +16036,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 9.815588, y: 4.4861712, z: 6.320452}
   m_Center: {x: -4.907794, y: 2.2430851, z: -2.6670773}
+--- !u!114 &1075313213 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8088857785731490619, guid: 141b47280ccd5514f9420e505d6f254c,
+    type: 3}
+  m_PrefabInstance: {fileID: 1067480354}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81cb616bbe67c0644a854c2b95a91b4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1087348558
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24660,6 +24677,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 583013523, guid: beec66131a70bcd4e957345ad0c80208, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1075313213}
+    - target: {fileID: 583013523, guid: beec66131a70bcd4e957345ad0c80208, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: ChangeScene
+      objectReference: {fileID: 0}
+    - target: {fileID: 786330302, guid: beec66131a70bcd4e957345ad0c80208, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1075313213}
+    - target: {fileID: 786330302, guid: beec66131a70bcd4e957345ad0c80208, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: ChangeScene
+      objectReference: {fileID: 0}
     - target: {fileID: 921780206935940898, guid: beec66131a70bcd4e957345ad0c80208,
         type: 3}
       propertyPath: m_Pivot.x
