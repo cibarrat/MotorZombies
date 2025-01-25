@@ -37,6 +37,8 @@ public class PlayerStats : MonoBehaviour
 
     private bool healPressed = false;
 
+    public float delayDeathTime = 0.3f;
+
     private void Awake()
     {
         tpsController = GetComponent<ThirdPersonShooterController>();
@@ -131,9 +133,15 @@ public class PlayerStats : MonoBehaviour
 
     public void GameOver()
     {
+        virtualCamera.enabled = false;
+        StartCoroutine(DeathDelay(delayDeathTime));
+    }
+
+    private IEnumerator DeathDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
         gameoverMenu.gameObject.SetActive(true);
         Time.timeScale = 0f;
-        virtualCamera.enabled = false;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
