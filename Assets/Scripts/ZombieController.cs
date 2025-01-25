@@ -32,6 +32,7 @@ public class ZombieController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI isChasingText;
     [SerializeField] private TextMeshProUGUI isAttackingText;
     [SerializeField] private TextMeshProUGUI isRoamingText;
+    [SerializeField] private TextMeshProUGUI seesPlayerText;
     public bool debug = false;
 
     private bool canMoan = true;
@@ -71,6 +72,7 @@ public class ZombieController : MonoBehaviour
             isChasingText.text = $"isChasing: {isChasing}";
             isAttackingText.text = $"isAttacking: {isAttacking}";
             isRoamingText.text = $"isRoaming: {isRoaming}";
+            seesPlayerText.text = $"seesPlayer: {seesPlayer}";
         }
         SeekPlayer();
         Moan();
@@ -87,7 +89,7 @@ public class ZombieController : MonoBehaviour
                 navMeshAgent.speed = chaseSpeed;
                 navMeshAgent.destination = playerPosition.position;
                 lastPlayerPosition = playerPosition.position;
-                Rotate(navMeshAgent.destination + new Vector3(0, 1, 0), weakSpot.transform);
+                //Rotate(navMeshAgent.destination + new Vector3(0, 1, 0), weakSpot.transform);
             }
             else if (navMeshAgent.remainingDistance > navMeshAgent.stoppingDistance)
             { 
@@ -228,6 +230,7 @@ public class ZombieController : MonoBehaviour
             playerPosition = GameObject.FindGameObjectWithTag("Player").transform;
             navMeshAgent.destination = playerPosition.position;
             Rotate(playerPosition.position);
+            sight.transform.LookAt(playerPosition.position);
             isChasing = true;
             isRoaming = false;
             canRoam = false;
@@ -298,7 +301,7 @@ public class ZombieController : MonoBehaviour
         seesPlayer = false;
         chaseCoroutine = null;
         sight.transform.localRotation = Quaternion.identity;
-        weakSpot.transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.identity, rotationSpeed * Time.deltaTime);
+        //weakSpot.transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.identity, rotationSpeed * Time.deltaTime);
     }
 
     Vector3 GetRandomPoint(Vector3 center, float radius)
