@@ -30,8 +30,7 @@ public class PlayerStats : MonoBehaviour
     private ThirdPersonShooterController tpsController;
     private ThirdPersonController tpController;
     private StarterAssetsInputs inputs;
-
-
+    private Animator animator;
 
     private bool healPressed = false;
 
@@ -62,6 +61,8 @@ public class PlayerStats : MonoBehaviour
         CamMovement = GameObject.Find("PlayerFollowCamera");
         virtualCamera = CamMovement.GetComponent<CinemachineVirtualCamera>();
         virtualCamera.enabled = true;
+        animator = GetComponent<Animator>();
+        inputs = GetComponent<StarterAssetsInputs>();
     }
 
     private void Update()
@@ -86,7 +87,7 @@ public class PlayerStats : MonoBehaviour
 
     public void Damage(float damage)
     {
-        // Hit animation
+        animator.SetBool("IsHit", true);//set Bool True
         tpsController.InterruptAimFocus();
         tpsController.InterruptReload();
         StartCoroutine(Hitstun(hitstun));
@@ -97,7 +98,11 @@ public class PlayerStats : MonoBehaviour
             // Death animation
             tpController.SetCanMove(false);
             GameOver();
+        } else
+        {
+            animator.SetBool("IsHit", false);//set Bool false
         }
+        
     }
 
     private IEnumerator Hitstun(float time)
