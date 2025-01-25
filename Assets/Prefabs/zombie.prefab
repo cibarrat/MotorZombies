@@ -1475,6 +1475,7 @@ GameObject:
   - component: {fileID: 4887293532015621551}
   - component: {fileID: 4887293532015621548}
   - component: {fileID: 4887293532015621549}
+  - component: {fileID: 626011430933385165}
   m_Layer: 2
   m_Name: zombie
   m_TagString: Enemy
@@ -1529,7 +1530,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17d3e984c5ba2e64283225771d650912, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HP: 400
+  HP: 100
   speed: 1
   chaseSpeed: 3
   rotationSpeed: 10
@@ -1553,6 +1554,7 @@ MonoBehaviour:
   isChasingText: {fileID: 0}
   isAttackingText: {fileID: 0}
   isRoamingText: {fileID: 0}
+  seesPlayerText: {fileID: 0}
   debug: 0
 --- !u!195 &4887293532015621551
 NavMeshAgent:
@@ -1685,6 +1687,27 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!95 &626011430933385165
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4887293532015621550}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: bf24747311c200a47a3b0ee21321ee27, type: 3}
+  m_Controller: {fileID: 9100000, guid: 1c81c23a6cdc0e64ca637ce8a39e2eb7, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &5442387251036606975
 GameObject:
   m_ObjectHideFlags: 0
