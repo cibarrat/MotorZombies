@@ -23,8 +23,6 @@ public class ThirdPersonShooterController : MonoBehaviour
     [SerializeField] private AudioClip gunClickSound;
     [SerializeField] private AudioClip gunReloadSound;
     [SerializeField] private GameObject bloodSplatter;
-    [SerializeField] Transform spineTransform;
-    [SerializeField] Transform neckTransform;
     public int LoadedAmmo { get; private set; } = 15;
     public float focusTime = 0.5f;
     public float shootRate = 0.5f;
@@ -107,7 +105,7 @@ public class ThirdPersonShooterController : MonoBehaviour
 
                 transform.forward = Vector3.Lerp(transform.forward, aimDirection, Time.deltaTime * 20f);
 
-                spineTransform.forward = Vector3.Lerp(spineTransform.forward, aimDirection, Time.deltaTime * 20f);
+                animator.GetBoneTransform(HumanBodyBones.Spine).LookAt(aimDirection);
                 Vector3 shootAimDirection = (mouseWorldPosition - spawnBulletPosition.position).normalized;
                 // Shoot
                 Shoot(shootAimDirection);
@@ -118,7 +116,7 @@ public class ThirdPersonShooterController : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(screenCenterPoint);
             if (Physics.Raycast(ray, out RaycastHit raycastHit, 999f, aimColliderLayerMask))
             {
-                neckTransform.forward = Vector3.Lerp(neckTransform.forward, raycastHit.point, Time.deltaTime * 20f);
+                animator.GetBoneTransform(HumanBodyBones.Neck).forward = Vector3.Lerp(animator.GetBoneTransform(HumanBodyBones.Neck).forward, raycastHit.point, Time.deltaTime * 20f);
             }
             thirdPersonController.SetCanRun(true);
             thirdPersonController.SetRotateOnMove(true);
@@ -127,7 +125,7 @@ public class ThirdPersonShooterController : MonoBehaviour
             obstacleCrosshair.SetActive(false);
             thirdPersonController.SetSensitivity(normalSensitivity);
             animator.SetLayerWeight(1, Mathf.Lerp(animator.GetLayerWeight(1), 0f, Time.deltaTime * 10f)); //set aim layer to 0 - idle
-            spineTransform.rotation = Quaternion.identity;
+            animator.GetBoneTransform(HumanBodyBones.Spine).rotation = Quaternion.identity;
             UnfocusCrosshair();
         }
         if (starterAssetsInputs.move != Vector2.zero && FocusCoroutine != null)

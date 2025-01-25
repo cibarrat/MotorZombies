@@ -24,6 +24,8 @@ public class PlayerStats : MonoBehaviour
     private Image gameoverMenu;
     private Image victoryMenu;
 
+    private bool isInvincible = false;
+
     public float Medkits { get; private set; } = 0;
     public int Ammo { get; private set; } = 0;
     public float currentHP { get; private set; }
@@ -87,31 +89,35 @@ public class PlayerStats : MonoBehaviour
 
     public void Damage(float damage)
     {
-        animator.SetBool("IsHit", true);//set Bool True
-        tpsController.InterruptAimFocus();
-        tpsController.InterruptReload();
-        StartCoroutine(Hitstun(hitstun));
-        AudioSource.PlayClipAtPoint(playerHurt, transform.position);
-        currentHP -= damage;
-        if (currentHP <= 0)
+        if (isInvincible)
         {
-            // Death animation
-            tpController.SetCanMove(false);
-            GameOver();
-        } else
-        {
-            animator.SetBool("IsHit", false);//set Bool false
+            animator.SetBool("IsHit", true);//set Bool True
+            tpsController.InterruptAimFocus();
+            tpsController.InterruptReload();
+            StartCoroutine(Hitstun(hitstun));
+            AudioSource.PlayClipAtPoint(playerHurt, transform.position);
+            currentHP -= damage;
+            if (currentHP <= 0)
+            {
+                // Death animation
+                tpController.SetCanMove(false);
+                GameOver();
+            } else
+            {
+                animator.SetBool("IsHit", false);//set Bool false
+            }
         }
-        
     }
 
     private IEnumerator Hitstun(float time)
     {
+        isInvincible = true;
         tpController.SetCanMove(false);
         tpsController.CanAim = false;
         yield return new WaitForSeconds(time);
         tpController.SetCanMove(true);
         tpsController.CanAim = true;
+        isInvincible = false;
     }
 
     public void Heal(float quantity)
