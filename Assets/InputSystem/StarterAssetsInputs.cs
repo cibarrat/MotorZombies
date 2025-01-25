@@ -16,6 +16,8 @@ namespace StarterAssets
 		public bool shoot;
 		public bool switchSides;
 		public bool pause;
+		public bool reload;
+		public bool heal;
 
         [Header("Movement Settings")]
 		public bool analogMovement;
@@ -65,6 +67,14 @@ namespace StarterAssets
         {
             SwitchSidesInput(value.isPressed);
         }
+        public void OnReload(InputValue value)
+        {
+            ReloadInput(value.isPressed);
+        }
+        public void OnHeal(InputValue value)
+        {
+            HealInput(value.isPressed);
+        }
 #endif
 
         public void MoveInput(Vector2 newMoveDirection)
@@ -107,6 +117,14 @@ namespace StarterAssets
         public void SwitchSidesInput(bool newSwitchSidesState)
         {
             switchSides = newSwitchSidesState;
+        }
+        public void ReloadInput(bool newReloadState)
+        {
+            reload = newReloadState;
+        }
+        public void HealInput(bool newHealState)
+        {
+            heal = newHealState;
         }
 
         private void SetCursorState(bool newState)
