@@ -14,7 +14,7 @@ public class ZombieController : MonoBehaviour
     [SerializeField] private float rotationSpeed = 10;
     [SerializeField] private GameObject weakSpot;
     [SerializeField] private float stunDamageLimit = 40;
-    [SerializeField] private float attackDamage = 20;
+    [field: SerializeField] public float AttackDamage { get; private set; } = 20;
     [SerializeField] private AudioClip hurtAudio;
     [SerializeField] private AudioClip attackAudio;
     [SerializeField] private AudioClip idleAudio;
@@ -25,6 +25,9 @@ public class ZombieController : MonoBehaviour
     [SerializeField] private float hitstun = 3;
     [SerializeField] private float chaseTimeout = 3;
     [SerializeField] private float attackEndlag = 3;
+    [SerializeField] private float hitboxStartupTime = 0.5f;
+    [SerializeField] private float hitboxDuration = 1f;
+    [SerializeField] private GameObject hitbox;
     [SerializeField] private TextMeshProUGUI canMoveText;
     [SerializeField] private TextMeshProUGUI canAttackText;
     [SerializeField] private TextMeshProUGUI canRoamText;
@@ -61,6 +64,15 @@ public class ZombieController : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         controller = GetComponentInChildren<CharacterController>();
         animator = GetComponent<Animator>();
+        Collider[] colliders = GetComponentsInChildren<Collider>();
+        foreach (Collider collider in colliders)
+        {
+            foreach (Collider otherCollider in colliders)
+            {
+                Physics.IgnoreCollision(collider, otherCollider, true);
+            }
+            
+        }
     }
 
     private void Update()
@@ -111,9 +123,13 @@ public class ZombieController : MonoBehaviour
             }
         }
         Roam();
-        if (canMove)
+        if (canMove && !navMeshAgent.isStopped)
         { 
-            animator.SetFloat("Speed", navMeshAgent.speed); 
+            animator.SetFloat("Speed", navMeshAgent.speed);
+        }
+        else
+        {
+            navMeshAgent.isStopped = true;
         }
   
     }
@@ -121,8 +137,6 @@ public class ZombieController : MonoBehaviour
     {
         if (canMove && canRoam && !isChasing && !isRoaming)
         {
-            //animator.SetTrigger("IsRoam");//Roam/Walk animation
-            //animator.speed = navMeshAgent.speed;
             navMeshAgent.speed = speed;
             Vector3 randomPoint = GetRandomPoint(transform.position, roamDistance);
             navMeshAgent.destination = randomPoint;
@@ -131,17 +145,20 @@ public class ZombieController : MonoBehaviour
         }
     }
 
-    private IEnumerator Attack(GameObject target)
+    private IEnumerator Attack()
     {
         if (!isAttacking && canAttack)
         {
+            navMeshAgent.isStopped = true;
+            SphereCollider attackRangeCollider = GetComponent<SphereCollider>();
             animator.SetTrigger("IsAttacking");
             isAttacking = true;
             canMove = false;
             canAttack = false;
             canRoam = false;
-            target.gameObject.GetComponent<PlayerStats>().Damage(attackDamage);
+            StartCoroutine(ActivateAttackHitbox(hitboxStartupTime));
             yield return new WaitForSeconds(attackEndlag);
+            navMeshAgent.isStopped = false; 
             canMove = true;
             canAttack = true;
             isAttacking = false;
@@ -216,6 +233,7 @@ public class ZombieController : MonoBehaviour
                 canAttack = false;
                 canMove = false;
                 canMoan = false;
+                canRoam = false;
                 StartCoroutine(Hitstun());
             }
             HP -= damage;
@@ -224,6 +242,7 @@ public class ZombieController : MonoBehaviour
                 animator.SetTrigger("IsDead");
                 StopAllCoroutines();
                 chanceOfGrunt = 1;
+                navMeshAgent.isStopped = true;
                 canMove = false;
                 canAttack = false;
                 canMoan = false;
@@ -290,11 +309,16 @@ public class ZombieController : MonoBehaviour
                 StopCoroutine(roamCoroutine);
                 roamCoroutine = null;
             }
-            StartCoroutine(Attack(other.gameObject));
+            StartCoroutine(Attack());
             audioSource.Stop();
             audioSource.PlayOneShot(attackAudio);
         }
 
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        
     }
 
     private IEnumerator WaitForNextMoan(float time)
@@ -310,6 +334,7 @@ public class ZombieController : MonoBehaviour
         canMoan = true;
         canMove = true;
         canAttack = true;
+        canRoam = true;
     }
 
     private IEnumerator ChaseTimeout()
@@ -319,6 +344,18 @@ public class ZombieController : MonoBehaviour
         chaseCoroutine = null;
         sight.transform.localRotation = Quaternion.identity;
         //weakSpot.transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.identity, rotationSpeed * Time.deltaTime);
+    }
+
+    private IEnumerator ActivateAttackHitbox(float time)
+    {
+        yield return new WaitForSeconds(time);
+        hitbox.SetActive(true);
+        StartCoroutine(DeactivateAttackHitbox(hitboxDuration));
+    }
+    private IEnumerator DeactivateAttackHitbox(float time)
+    {
+        yield return new WaitForSeconds(time);
+        hitbox.SetActive(false);
     }
 
     Vector3 GetRandomPoint(Vector3 center, float radius)
@@ -347,8 +384,9 @@ public class ZombieController : MonoBehaviour
 
     private IEnumerator IdleTimeout(float time)
     {
-       
+        navMeshAgent.isStopped = true;
         yield return new WaitForSeconds(time);
+        navMeshAgent.isStopped = false;
         canRoam = true;
     }
 }

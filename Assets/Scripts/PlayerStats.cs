@@ -17,6 +17,7 @@ public class PlayerStats : MonoBehaviour
     [SerializeField] private TextMeshProUGUI healthText;
     [SerializeField] private TextMeshProUGUI medkitsText;
     [SerializeField] private AudioClip playerHurt;
+    [SerializeField] private AudioClip healEffect;
     [SerializeField] private GameObject canvas;
     private GameObject CamMovement;
 
@@ -95,18 +96,22 @@ public class PlayerStats : MonoBehaviour
         if (!isInvincible) 
         {
         	postProcessingVolume.ActivateDamageVignette();
-            animator.SetTrigger("IsHit");//Hit Damage Animation
             tpsController.InterruptAimFocus();
             tpsController.InterruptReload();
-            StartCoroutine(Hitstun(hitstun));
             AudioSource.PlayClipAtPoint(playerHurt, transform.position);
             currentHP -= damage;
             if (currentHP <= 0)
             {
                 animator.SetTrigger("IsDead");//Death Animation
                 tpController.SetCanMove(false);
+                tpsController.CanAim = false;
+                isInvincible = true;
                 GameOver();
-            } 
+            } else
+            {
+                StartCoroutine(Hitstun(hitstun));
+                animator.SetTrigger("IsHit");//Hit Damage Animation
+            }
         }
     }
 
@@ -124,6 +129,7 @@ public class PlayerStats : MonoBehaviour
     public void Heal(float quantity)
     {
         postProcessingVolume.ActivateHealVignette();
+        AudioSource.PlayClipAtPoint(healEffect, transform.position);
         currentHP += quantity;
         if (currentHP > maxHP)
         {
@@ -175,11 +181,13 @@ public class PlayerStats : MonoBehaviour
         if (other.gameObject.CompareTag("Ammo"))
         {
             Ammo += other.gameObject.GetComponent<ItemHandler>().Quantity;
+            AudioSource.PlayClipAtPoint(other.gameObject.GetComponent<ItemHandler>().PickupSound, transform.position);
             GameObject.Destroy(other.gameObject);
         }
         if (other.gameObject.CompareTag("Medkit"))
         {
             Medkits += other.gameObject.GetComponent<ItemHandler>().Quantity;
+            AudioSource.PlayClipAtPoint(other.gameObject.GetComponent<ItemHandler>().PickupSound, transform.position);
             GameObject.Destroy(other.gameObject);
         }
         if (other.gameObject.CompareTag("Goal"))

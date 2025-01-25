@@ -44,6 +44,7 @@ public class ThirdPersonShooterController : MonoBehaviour
 
     private Coroutine FocusCoroutine = null;
     private Coroutine ReloadCoroutine = null;
+    private AudioSource audioSource;
 
     private void Awake()
     {
@@ -52,6 +53,7 @@ public class ThirdPersonShooterController : MonoBehaviour
         animator = GetComponent<Animator>();
         stats = GetComponent<PlayerStats>();
         LoadedAmmo = stats.AmmoCapacity;
+        audioSource = GetComponent<AudioSource>(); 
     }
 
     private void Update()
@@ -188,6 +190,7 @@ public class ThirdPersonShooterController : MonoBehaviour
         
         if (stats.Ammo > 0)
         {
+            audioSource.PlayOneShot(gunReloadSound);
             animator.SetLayerWeight(1, Mathf.Lerp(animator.GetLayerWeight(1), 0f, Time.deltaTime * 10f));//set aim layer 1
             animator.SetTrigger("IsReload");//set Bool True <---AQUI ESTA REVISANDO SI AMMO O NO
             isReloading = true;
@@ -287,6 +290,7 @@ public class ThirdPersonShooterController : MonoBehaviour
         if (ReloadCoroutine != null)
         {
             StopCoroutine(ReloadCoroutine);
+            audioSource.Stop();
             isReloading = false;
             ReloadCoroutine = null;
         }
