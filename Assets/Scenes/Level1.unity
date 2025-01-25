@@ -10782,6 +10782,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f0f683d1f9d0594a914539a6e81a8ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  damageVolumeProfile: {fileID: 11400000, guid: b09beb8c8b099df40a61db2f286a277e,
+    type: 2}
+  healVolumeProfile: {fileID: 11400000, guid: 39b520988389d1b4390535953f3bd5be, type: 2}
 --- !u!114 &705454432
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10798,7 +10801,7 @@ MonoBehaviour:
   priority: 0
   blendDistance: 0
   weight: 1
-  sharedProfile: {fileID: 11400000, guid: 7a63373758f4eeb43b9984791c8a2169, type: 2}
+  sharedProfile: {fileID: 11400000, guid: b09beb8c8b099df40a61db2f286a277e, type: 2}
 --- !u!4 &705454433
 Transform:
   m_ObjectHideFlags: 0
@@ -16121,6 +16124,11 @@ PrefabInstance:
     - target: {fileID: 8088857785731490619, guid: 141b47280ccd5514f9420e505d6f254c,
         type: 3}
       propertyPath: postProcessingObject
+      value: 
+      objectReference: {fileID: 705454431}
+    - target: {fileID: 8088857785731490619, guid: 141b47280ccd5514f9420e505d6f254c,
+        type: 3}
+      propertyPath: postProcessingVolume
       value: 
       objectReference: {fileID: 705454431}
     - target: {fileID: 9113974557445133231, guid: 141b47280ccd5514f9420e505d6f254c,

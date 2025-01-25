@@ -196,12 +196,13 @@ public class ZombieController : MonoBehaviour
         {
             float chanceOfGrunt = Random.Range(0f, 1f);
             if (hitSpot.gameObject == weakSpot)
-            {   //animator.SetTrigger("IsHitStun");
+            {   
                 damage *= Random.Range(1.5f, 2);
                 chanceOfGrunt *= 1.1f;
             }
             if (damage >= stunDamageLimit)
             {
+                animator.SetTrigger("IsHitStun");
                 chanceOfGrunt = 1;
                 canAttack = false;
                 canMove = false;
