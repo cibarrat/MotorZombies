@@ -23,7 +23,7 @@ public class ThirdPersonShooterController : MonoBehaviour
     [SerializeField] private AudioClip gunClickSound;
     [SerializeField] private AudioClip gunReloadSound;
     [SerializeField] private GameObject bloodSplatter;
-    public int LoadedAmmo { get; private set; } = 15;
+    public int LoadedAmmo { get; private set; }
     public float focusTime = 0.5f;
     public float shootRate = 0.5f;
     public float unfocusedCrosshairRadius = 0.5f;
@@ -51,6 +51,7 @@ public class ThirdPersonShooterController : MonoBehaviour
         thirdPersonController = GetComponent<ThirdPersonController>();
         animator = GetComponent<Animator>();
         stats = GetComponent<PlayerStats>();
+        LoadedAmmo = stats.AmmoCapacity;
     }
 
     private void Update()

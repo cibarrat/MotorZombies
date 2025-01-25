@@ -33,7 +33,7 @@ public class PlayerStats : MonoBehaviour
     private ThirdPersonController tpController;
     private StarterAssetsInputs inputs;
     private Animator animator;
-	public PostProcessing postProcessingObject;
+	public PostProcessing postProcessingVolume;
 
     private bool healPressed = false;
 
@@ -92,7 +92,7 @@ public class PlayerStats : MonoBehaviour
     {
         if (!isInvincible) 
         {
-        	postProcessingObject.ActivateDamageVignette();
+        	postProcessingVolume.ActivateDamageVignette();
             animator.SetTrigger("IsHit");//Hit Damage Animation
             tpsController.InterruptAimFocus();
             tpsController.InterruptReload();
@@ -121,6 +121,7 @@ public class PlayerStats : MonoBehaviour
 
     public void Heal(float quantity)
     {
+        postProcessingVolume.ActivateHealVignette();
         currentHP += quantity;
         if (currentHP > maxHP)
         {
