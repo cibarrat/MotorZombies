@@ -16,18 +16,23 @@ public class MainMenu : MonoBehaviour
     public AudioSource actionSound;
     private bool buttonsShown = false;
     public float fadeDuration = 0.5f;
+    private float sceneLoadTime;
 
     void Start()
     {
-
+        sceneLoadTime = Time.time;
+        skipButton.SetActive(true);
     }
     void Update()
     {
+        float sceneTime = Time.time - sceneLoadTime;
+
+        
         if (videoPlayer.isPlaying && videoPlayer.time >= showButtonsTime && !buttonsShown)
         {
             ShowButtons(true);
         }
-        if (Time.time >= 6.5f)
+        if (sceneTime >= 6.5f)
         {
             if (skipButton != null)
             {
