@@ -1,6 +1,7 @@
 using StarterAssets;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.InputSystem.XR;
@@ -8,7 +9,8 @@ using UnityEngine.InputSystem.XR;
 public class ZombieController : MonoBehaviour
 {
     [SerializeField] private float HP = 400;
-    [SerializeField] private float speed = 4;
+    [SerializeField] private float speed = 2;
+    [SerializeField] private float chaseSpeed = 3;
     [SerializeField] private float rotationSpeed = 10;
     [SerializeField] private GameObject weakSpot;
     [SerializeField] private float stunDamageLimit = 40;
@@ -23,11 +25,20 @@ public class ZombieController : MonoBehaviour
     [SerializeField] private float hitstun = 3;
     [SerializeField] private float chaseTimeout = 3;
     [SerializeField] private float attackEndlag = 3;
+    [SerializeField] private TextMeshProUGUI canMoveText;
+    [SerializeField] private TextMeshProUGUI canAttackText;
+    [SerializeField] private TextMeshProUGUI canRoamText;
+    [SerializeField] private TextMeshProUGUI canMoanText;
+    [SerializeField] private TextMeshProUGUI isChasingText;
+    [SerializeField] private TextMeshProUGUI isAttackingText;
+    [SerializeField] private TextMeshProUGUI isRoamingText;
+    public bool debug = false;
 
     private bool canMoan = true;
     private bool canMove = true;
     private bool canAttack = true;
     private bool canRoam = true;
+    private bool seesPlayer = false;
     private bool isChasing = false;
     private bool isAttacking = false;
     private bool isRoaming = false;
@@ -50,18 +61,29 @@ public class ZombieController : MonoBehaviour
 
     private void Update()
     {
+        if (debug)
+        {
+            canMoveText.text = $"canMove: {canMove}";
+            canAttackText.text = $"canAttack: {canAttack}";
+            canRoamText.text = $"canRoam: {canRoam}";
+            canMoanText.text = $"canMoan: {canMoan}";
+            isChasingText.text = $"isChasing: {isChasing}";
+            isAttackingText.text = $"isAttacking: {isAttacking}";
+            isRoamingText.text = $"isRoaming: {isRoaming}";
+        }
         SeekPlayer();
         Moan();
         Walk();
-        
+
     }
 
     private void Walk()
     {
-        if (canMove)
+        if (canMove && isChasing)
         {
-            if (isChasing)
+            if (seesPlayer)
             {
+                navMeshAgent.speed = chaseSpeed;
                 navMeshAgent.destination = playerPosition.position;
                 lastPlayerPosition = playerPosition.position;
                 Rotate(navMeshAgent.destination + new Vector3(0, 1, 0), weakSpot.transform);
@@ -71,22 +93,25 @@ public class ZombieController : MonoBehaviour
                 navMeshAgent.destination = lastPlayerPosition;
             } else
             {
-                Roam();
+                isChasing = false;
+                canRoam = true;
             }
             if (Vector3.Distance(navMeshAgent.destination, transform.position) <= 1)
             {
                 Rotate(navMeshAgent.destination);
             }
         }
+        Roam();
     }
     private void Roam()
     {
         if (canMove && canRoam && !isChasing && !isRoaming)
         {
-            Vector3 randomPoint = GetRandomPoint(transform.position, 10);
-            navMeshAgent.SetDestination(randomPoint);
+            navMeshAgent.speed = speed;
+            Vector3 randomPoint = GetRandomPoint(transform.position, roamDistance);
+            navMeshAgent.destination = randomPoint;
             isRoaming = true;
-            StartCoroutine(RoamTimeout(Random.Range(1, 7)));
+            StartCoroutine(RoamTimeout(Random.Range(1, 15)));
         }
     }
 
@@ -137,10 +162,12 @@ public class ZombieController : MonoBehaviour
                 playerPosition = hit.collider.transform;
                 if (chaseCoroutine != null)
                 {
-                    Debug.Log("Stopping chase timeout");
                     StopCoroutine(chaseCoroutine);
                     chaseCoroutine = null;
                 }
+                seesPlayer = true;
+                isRoaming = false;
+                canRoam = false;
                 sight.transform.LookAt(playerPosition);
             } else
             {
@@ -186,6 +213,8 @@ public class ZombieController : MonoBehaviour
                 playerPosition = GameObject.FindGameObjectWithTag("Player").transform;
                 Rotate(playerPosition.position);
                 isChasing = true;
+                isRoaming = false;
+                canRoam = false;
             }
         }
     }
@@ -245,11 +274,9 @@ public class ZombieController : MonoBehaviour
 
     private IEnumerator ChaseTimeout()
     {
-        Debug.Log("Start chase timeout");
         yield return new WaitForSeconds(chaseTimeout);
-        isChasing = false;
+        seesPlayer = false;
         chaseCoroutine = null;
-        Debug.Log("Chase timed out");
         sight.transform.localRotation = Quaternion.identity;
         weakSpot.transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.identity, rotationSpeed * Time.deltaTime);
     }
