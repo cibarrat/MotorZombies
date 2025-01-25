@@ -54,7 +54,7 @@ public class PostProcessing : MonoBehaviour
     public void ActivateDamageVignette()
     {
         intensity = 0.4f;
-        reduceIntensityTime = Time.time + 0.4f;
+        reduceIntensityTime = sceneTime + 0.4f;
         _vignette.intensity.value = intensity;
     }
 }
