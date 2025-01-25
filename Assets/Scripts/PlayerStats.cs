@@ -88,7 +88,7 @@ public class PlayerStats : MonoBehaviour
 
     public void Damage(float damage)
     {
-        if (isInvincible)
+        if (!isInvincible)
         {
             // Hit animation
             tpsController.InterruptAimFocus();
