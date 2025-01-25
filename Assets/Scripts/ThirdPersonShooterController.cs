@@ -188,8 +188,8 @@ public class ThirdPersonShooterController : MonoBehaviour
         
         if (stats.Ammo > 0)
         {
+            animator.SetLayerWeight(1, Mathf.Lerp(animator.GetLayerWeight(1), 0f, Time.deltaTime * 10f));//set aim layer 1
             animator.SetTrigger("IsReload");//set Bool True <---AQUI ESTA REVISANDO SI AMMO O NO
-            //animator.SetLayerWeight(2, Mathf.Lerp(animator.GetLayerWeight(2), 1f, Time.deltaTime * 10f));//set aim layer 2
             isReloading = true;
             yield return new WaitForSeconds(reloadTime);
             LoadedAmmo = stats.ReloadAmmo(LoadedAmmo);
