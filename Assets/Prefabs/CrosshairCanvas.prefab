@@ -984,8 +984,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 8088857785731490619, guid: 141b47280ccd5514f9420e505d6f254c,
-          type: 3}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: PlayerStats, Assembly-CSharp
         m_MethodName: ChangeScene
         m_Mode: 1

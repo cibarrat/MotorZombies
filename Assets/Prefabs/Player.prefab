@@ -2678,7 +2678,7 @@ Animator:
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 116b318c9707f144588e854ed0ee6c75, type: 3}
   m_Controller: {fileID: 9100000, guid: 40db3173a05ae3242b1c182a09b0a183, type: 2}
-  m_CullingMode: 1
+  m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
@@ -2735,8 +2735,6 @@ MonoBehaviour:
   gunReloadSound: {fileID: 0}
   bloodSplatter: {fileID: 5546061203685830786, guid: eba1b97c62730ae46bb36a70990be12d,
     type: 3}
-  spineTransform: {fileID: 370372138059026554}
-  neckTransform: {fileID: 370372138457587536}
   focusTime: 1
   shootRate: 0.5
   unfocusedCrosshairRadius: 20
@@ -2961,6 +2959,7 @@ MonoBehaviour:
   healthText: {fileID: 0}
   medkitsText: {fileID: 0}
   playerHurt: {fileID: 8300000, guid: 332920b9edfdecb418f98f877b3dfdcd, type: 3}
+  canvas: {fileID: 0}
 --- !u!1 &8087473558020141031
 GameObject:
   m_ObjectHideFlags: 0
