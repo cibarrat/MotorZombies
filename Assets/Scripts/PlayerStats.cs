@@ -33,6 +33,7 @@ public class PlayerStats : MonoBehaviour
     private ThirdPersonController tpController;
     private StarterAssetsInputs inputs;
     private Animator animator;
+	public PostProcessing postProcessingObject;
 
     private bool healPressed = false;
 
@@ -89,8 +90,9 @@ public class PlayerStats : MonoBehaviour
 
     public void Damage(float damage)
     {
-       // if (!isInvincible) 
-        //{
+        if (!isInvincible) 
+        {
+        	postProcessingObject.ActivateDamageVignette();
             animator.SetTrigger("IsHit");//Hit Damage Animation
             tpsController.InterruptAimFocus();
             tpsController.InterruptReload();
@@ -103,7 +105,7 @@ public class PlayerStats : MonoBehaviour
                 tpController.SetCanMove(false);
                 GameOver();
             } 
-        //}
+        }
     }
 
     private IEnumerator Hitstun(float time)
