@@ -22,6 +22,7 @@ public class PlayerStats : MonoBehaviour
 
     private CinemachineVirtualCamera virtualCamera;
     private Image gameoverMenu;
+    private Image victoryMenu;
 
     public float Medkits { get; private set; } = 0;
     public int Ammo { get; private set; } = 0;
@@ -41,15 +42,22 @@ public class PlayerStats : MonoBehaviour
         currentHP = maxHP;
         inputs = GetComponent<StarterAssetsInputs>();
         Transform imageTransform = canvas.transform.Find("YouDiedMenu");
+        Transform imageTransformVictory = canvas.transform.Find("VictoryMenu");
         if (imageTransform != null)
         {
             gameoverMenu = imageTransform.GetComponent<Image>();
+        }
+        if (imageTransformVictory != null)
+        {
+            victoryMenu = imageTransformVictory.GetComponent<Image>();
         }
     }
     private void Start()
     {
         Time.timeScale = 1f;
+
         gameoverMenu.gameObject.SetActive(false);
+        victoryMenu.gameObject.SetActive(false);
 
         CamMovement = GameObject.Find("PlayerFollowCamera");
         virtualCamera = CamMovement.GetComponent<CinemachineVirtualCamera>();
@@ -121,7 +129,11 @@ public class PlayerStats : MonoBehaviour
 
     public void Victory()
     {
-        Debug.Log("You Escaped!");
+        victoryMenu.gameObject.SetActive(true);
+        Time.timeScale = 0f;
+        virtualCamera.enabled = false;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     public int ReloadAmmo(int quantity)
