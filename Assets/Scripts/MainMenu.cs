@@ -98,8 +98,8 @@ public class MainMenu : MonoBehaviour
         }
         else
         {
-            SceneManager.LoadScene("Scenes/Playground");
-            //SceneManager.LoadScene("Scenes/Level1");
+
+            SceneManager.LoadScene("Scenes/Level1");
         }
 
     }
@@ -124,8 +124,7 @@ public class MainMenu : MonoBehaviour
     private IEnumerator LoadSceneAfterSound( float delay)
     {
         yield return new WaitForSeconds(delay);
-        SceneManager.LoadScene("Scenes/Playground");
-        //SceneManager.LoadScene("Scenes/Level1");
+        SceneManager.LoadScene("Scenes/Level1");
     }
 
     private IEnumerator QuitAfterSound(float delay)
