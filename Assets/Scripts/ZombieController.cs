@@ -122,7 +122,7 @@ public class ZombieController : MonoBehaviour
             isAttacking = true;
             canMove = false;
             canAttack = false;
-            target.GetComponent<ThirdPersonController>();
+            target.gameObject.GetComponent<PlayerStats>().Damage(attackDamage);
             yield return new WaitForSeconds(attackEndlag);
             canMove = true;
             canAttack = true;

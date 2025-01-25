@@ -23,38 +23,50 @@ public class ThirdPersonShooterController : MonoBehaviour
     [SerializeField] private GameObject bloodSplatter;
     [SerializeField] Transform spineTransform;
     [SerializeField] Transform neckTransform;
+    public int LoadedAmmo { get; private set; } = 15;
     public float focusTime = 0.5f;
     public float shootRate = 0.5f;
     public float unfocusedCrosshairRadius = 0.5f;
     public float focusedCrosshairRadius = 0.1f;
     public float shootDamage = 15;
+    public float reloadTime = 3;
 
     private StarterAssetsInputs starterAssetsInputs;
     private ThirdPersonController thirdPersonController;
     private Animator animator;
+    private PlayerStats stats;
     private bool crosshairFocused = false;
     private bool currentSide = true;
     private float shootRateTimeout = 0f;
+    private bool gunClick = false;
+    private bool isReloading = false;
+    public bool CanAim { get; set; } = true;
 
-    Coroutine focusCoroutine = null;
+    private Coroutine FocusCoroutine = null;
+    private Coroutine ReloadCoroutine = null;
 
     private void Awake()
     {
         starterAssetsInputs = GetComponent<StarterAssetsInputs>(); 
         thirdPersonController = GetComponent<ThirdPersonController>();
         animator = GetComponent<Animator>();
+        stats = GetComponent<PlayerStats>();
     }
 
     private void Update()
     {
         SwitchAimSide();
         Aim();
+        if (starterAssetsInputs.reload && LoadedAmmo < stats.AmmoCapacity && ReloadCoroutine == null)
+        {
+            ReloadCoroutine = StartCoroutine(Reload());
+        }
     }
 
     private void Aim()
     {
         Vector2 screenCenterPoint = new Vector2(Screen.width / 2f, Screen.height / 2f);
-        if (starterAssetsInputs.aim)
+        if (CanAim && starterAssetsInputs.aim)
         {
             thirdPersonController.SetCanRun(false);
             if (shootRateTimeout > 0f)
@@ -65,10 +77,13 @@ public class ThirdPersonShooterController : MonoBehaviour
             crosshair.SetActive(true);
             thirdPersonController.SetRotateOnMove(false);
             thirdPersonController.SetSensitivity(aimSensitivity);
-            animator.SetLayerWeight(1, Mathf.Lerp(animator.GetLayerWeight(1), 1f, Time.deltaTime * 10f));//set aim layer 1
-            if (!crosshairFocused && starterAssetsInputs.move == Vector2.zero && focusCoroutine == null)
+            if (!isReloading)
             {
-                focusCoroutine = StartCoroutine(FocusCrosshair(focusTime));
+                animator.SetLayerWeight(1, Mathf.Lerp(animator.GetLayerWeight(1), 1f, Time.deltaTime * 10f));//set aim layer 1
+            }
+            if (!crosshairFocused && starterAssetsInputs.move == Vector2.zero && FocusCoroutine == null)
+            {
+                FocusCoroutine = StartCoroutine(FocusCrosshair(focusTime));
             }
             else if (crosshairFocused && starterAssetsInputs.move != Vector2.zero)
             {
@@ -113,40 +128,68 @@ public class ThirdPersonShooterController : MonoBehaviour
             spineTransform.rotation = Quaternion.identity;
             UnfocusCrosshair();
         }
-        if (starterAssetsInputs.move != Vector2.zero && focusCoroutine != null)
+        if (starterAssetsInputs.move != Vector2.zero && FocusCoroutine != null)
         {
             UnfocusCrosshair();
         }
     }
     private void Shoot(Vector3 shootAimDirection)
     {
-
-        if (starterAssetsInputs.shoot && shootRateTimeout <= 0f && Physics.Raycast(spawnBulletPosition.position, shootAimDirection, out RaycastHit hitInfo, 999f, aimColliderLayerMask))
+        if (LoadedAmmo > 0 && !isReloading)
         {
-            AudioSource.PlayClipAtPoint(gunFire, spawnBulletPosition.position);
-            shootRateTimeout = shootRate;
-            if (hitInfo.collider.gameObject.CompareTag("Enemy"))
+            if (starterAssetsInputs.shoot && shootRateTimeout <= 0f && Physics.Raycast(spawnBulletPosition.position, shootAimDirection, out RaycastHit hitInfo, 999f, aimColliderLayerMask))
             {
-                float damage = shootDamage * Random.Range(1, 1.3f);
-                if (crosshairFocused)
+                AudioSource.PlayClipAtPoint(gunFire, spawnBulletPosition.position);
+                shootRateTimeout = shootRate;
+                if (hitInfo.collider.gameObject.CompareTag("Enemy"))
                 {
-                    damage *= Random.Range(1.1f, 1.5f);
+                    float damage = shootDamage * Random.Range(1, 1.3f);
+                    if (crosshairFocused)
+                    {
+                        damage *= Random.Range(1.1f, 1.5f);
+                    }
+                    Instantiate(bloodSplatter, hitInfo.point, Quaternion.identity);
+                    hitInfo.collider.gameObject.GetComponentInParent<ZombieController>().Damage(damage, hitInfo.collider);
                 }
-                Instantiate(bloodSplatter, hitInfo.point, Quaternion.identity);
-                hitInfo.collider.gameObject.GetComponentInParent<ZombieController>().Damage(damage, hitInfo.collider);
+                else
+                {
+                    GameObject bulletHole = Instantiate(bulletHolePrefab, hitInfo.point + hitInfo.normal * 0.01f, Quaternion.identity);
+                    bulletHole.transform.rotation = Quaternion.LookRotation(hitInfo.normal);
+                    bulletHole.transform.SetParent(hitInfo.collider.transform);
+                    GameObject.Destroy(bulletHole, 5);
+                }
+                UnfocusCrosshair();
+                LoadedAmmo--;
             }
-            else
-            {
-                GameObject bulletHole = Instantiate(bulletHolePrefab, hitInfo.point + hitInfo.normal * 0.01f, Quaternion.identity);
-                bulletHole.transform.rotation = Quaternion.LookRotation(hitInfo.normal);
-                bulletHole.transform.SetParent(hitInfo.collider.transform);
-                GameObject.Destroy(bulletHole, 5);
-            }
-            UnfocusCrosshair();
-
         }
-        
+        else
+        { 
+            if (gunClick && ReloadCoroutine == null)
+            {
+                ReloadCoroutine = StartCoroutine(Reload());
+
+            } else
+            {
+                // Click noise;
+                gunClick = true;
+            }
+        }
     }
+
+    private IEnumerator Reload()
+    {
+        //Reload animation
+        if (stats.Ammo > 0)
+        {
+            isReloading = true;
+            yield return new WaitForSeconds(reloadTime);
+            LoadedAmmo = stats.ReloadAmmo(LoadedAmmo);
+            gunClick = false;
+        }
+        isReloading = false;
+        ReloadCoroutine = null;
+    }
+
     private IEnumerator FocusCrosshair(float time)
     {
         yield return new WaitForSeconds(time);
@@ -160,7 +203,7 @@ public class ThirdPersonShooterController : MonoBehaviour
             }
         } else
         {
-            focusCoroutine = null;
+            FocusCoroutine = null;
         }
     }
 
@@ -192,10 +235,10 @@ public class ThirdPersonShooterController : MonoBehaviour
     }
     private void UnfocusCrosshair()
     {
-        if (focusCoroutine != null)
+        if (FocusCoroutine != null)
         {
-            StopCoroutine(focusCoroutine);
-            focusCoroutine = null;
+            StopCoroutine(FocusCoroutine);
+            FocusCoroutine = null;
         }
         if (crosshairFocused)
         {
@@ -225,6 +268,26 @@ public class ThirdPersonShooterController : MonoBehaviour
         } else
         {
             currentSide = true;
+        }
+    }
+
+    public void InterruptReload()
+    {
+        if (ReloadCoroutine != null)
+        {
+            StopCoroutine(ReloadCoroutine);
+            isReloading = false;
+            ReloadCoroutine = null;
+        }
+    }
+
+    public void InterruptAimFocus()
+    {
+        if (FocusCoroutine != null)
+        {
+            StopCoroutine(FocusCoroutine);
+            crosshairFocused = false;
+            FocusCoroutine = null;
         }
     }
 }

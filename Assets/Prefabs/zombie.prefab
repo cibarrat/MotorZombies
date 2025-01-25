@@ -1530,7 +1530,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   HP: 400
-  speed: 4
+  speed: 1
+  chaseSpeed: 3
   rotationSpeed: 10
   weakSpot: {fileID: 6057045713807223530}
   stunDamageLimit: 40
@@ -1545,6 +1546,14 @@ MonoBehaviour:
   hitstun: 3
   chaseTimeout: 3
   attackEndlag: 3
+  canMoveText: {fileID: 0}
+  canAttackText: {fileID: 0}
+  canRoamText: {fileID: 0}
+  canMoanText: {fileID: 0}
+  isChasingText: {fileID: 0}
+  isAttackingText: {fileID: 0}
+  isRoamingText: {fileID: 0}
+  debug: 0
 --- !u!195 &4887293532015621551
 NavMeshAgent:
   m_ObjectHideFlags: 0

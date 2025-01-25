@@ -2638,6 +2638,7 @@ GameObject:
   - component: {fileID: 7143973273824730619}
   - component: {fileID: 6884353443388178827}
   - component: {fileID: 1816930512549621562}
+  - component: {fileID: 8088857785731490619}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -2725,7 +2726,7 @@ MonoBehaviour:
   obstacleCrosshair: {fileID: 0}
   aimColliderLayerMask:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 257
   spawnBulletPosition: {fileID: 2418080051967693768}
   bulletHolePrefab: {fileID: 5112035868809979404, guid: 7ee8ad62227cf5644a82baec9dbe9123,
     type: 3}
@@ -2739,6 +2740,7 @@ MonoBehaviour:
   unfocusedCrosshairRadius: 20
   focusedCrosshairRadius: 0.1
   shootDamage: 15
+  reloadTime: 3
 --- !u!114 &6884353443388178828
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2821,6 +2823,8 @@ MonoBehaviour:
   shoot: 0
   switchSides: 0
   pause: 0
+  reload: 0
+  heal: 0
   analogMovement: 0
   cursorLocked: 1
   cursorInputForLook: 1
@@ -2936,6 +2940,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   canvas: {fileID: 0}
+--- !u!114 &8088857785731490619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6884353443388178823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81cb616bbe67c0644a854c2b95a91b4f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHP: 100
+  <AmmoCapacity>k__BackingField: 15
+  hitstun: 2
+  ammoText: {fileID: 0}
+  healthText: {fileID: 0}
+  medkitsText: {fileID: 0}
+  playerHurt: {fileID: 8300000, guid: 332920b9edfdecb418f98f877b3dfdcd, type: 3}
 --- !u!1 &8087473558020141031
 GameObject:
   m_ObjectHideFlags: 0
