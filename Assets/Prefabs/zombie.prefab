@@ -1546,7 +1546,7 @@ MonoBehaviour:
   roamDistance: 10
   hitstun: 3
   chaseTimeout: 3
-  attackEndlag: 3
+  attackEndlag: 2.2
   canMoveText: {fileID: 0}
   canAttackText: {fileID: 0}
   canRoamText: {fileID: 0}

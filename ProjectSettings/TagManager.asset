@@ -9,6 +9,7 @@ TagManager:
   - Ammo
   - Medkit
   - Goal
+  - MainArea
   layers:
   - Default
   - TransparentFX

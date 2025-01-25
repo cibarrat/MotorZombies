@@ -6,6 +6,9 @@ using UnityEngine.Rendering.Universal;
 
 public class PostProcessing : MonoBehaviour
 {
+    [SerializeField] private VolumeProfile damageVolumeProfile;
+    [SerializeField] private VolumeProfile healVolumeProfile;
+
     private float intensity = 0;
     private float sceneTime;
     private float startTime;
@@ -19,7 +22,6 @@ public class PostProcessing : MonoBehaviour
     {
         startTime = Time.time;
         _volume = GetComponent<Volume>();
-
         //como el vignette no es un component, tenemos que sacarlo usando el profile que creamos
         _volume.profile.TryGet<Vignette>(out _vignette); //se usa out para guardar el resultado en _vignette, ya que la función como tal devuelve true o false
 
@@ -53,6 +55,17 @@ public class PostProcessing : MonoBehaviour
 
     public void ActivateDamageVignette()
     {
+        _volume.profile = damageVolumeProfile;
+        _volume.profile.TryGet<Vignette>(out _vignette);
+        intensity = 0.4f;
+        reduceIntensityTime = sceneTime + 0.4f;
+        _vignette.intensity.value = intensity;
+    }
+
+    public void ActivateHealVignette()
+    {
+        _volume.profile = healVolumeProfile;
+        _volume.profile.TryGet<Vignette>(out _vignette);
         intensity = 0.4f;
         reduceIntensityTime = sceneTime + 0.4f;
         _vignette.intensity.value = intensity;

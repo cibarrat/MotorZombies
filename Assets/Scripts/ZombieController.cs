@@ -167,7 +167,7 @@ public class ZombieController : MonoBehaviour
 
     void CastRayFromScreenPoint(Vector2 screenPoint)
     {
-        // Usa la cámara para convertir un punto en la pantalla a un rayo en el mundo
+        // Usa la cï¿½mara para convertir un punto en la pantalla a un rayo en el mundo
         Ray ray = sight.ScreenPointToRay(screenPoint);
 
         // Lanza el raycast y comprueba si golpea algo
@@ -205,11 +205,12 @@ public class ZombieController : MonoBehaviour
         {
             float chanceOfGrunt = Random.Range(0f, 1f);
             if (hitSpot.gameObject == weakSpot)
-            {   damage *= Random.Range(1.5f, 2);
+            {   
+                damage *= Random.Range(1.5f, 2);
                 chanceOfGrunt *= 1.1f;
             }
             if (damage >= stunDamageLimit)
-            {   
+            {
                 animator.SetTrigger("IsHitStun");
                 chanceOfGrunt = 1;
                 canAttack = false;
