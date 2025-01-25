@@ -11,7 +11,7 @@ public class PlayerStats : MonoBehaviour
 {
 
     [SerializeField] private float maxHP = 100;
-    [field:SerializeField] public int AmmoCapacity { get; private set; } = 15;
+    [field: SerializeField] public int AmmoCapacity { get; private set; } = 15;
     [SerializeField] private float hitstun = 2;
     [SerializeField] private TextMeshProUGUI ammoText;
     [SerializeField] private TextMeshProUGUI healthText;
@@ -33,6 +33,7 @@ public class PlayerStats : MonoBehaviour
     private ThirdPersonController tpController;
     private StarterAssetsInputs inputs;
 
+    public PostProcessing postProcessingObject;
 
 
     private bool healPressed = false;
@@ -74,13 +75,15 @@ public class PlayerStats : MonoBehaviour
         medkitsText.text = $"Medkits: {Medkits}";
         if (inputs.heal)
         {
-            if (!healPressed && Medkits > 0) {
+            if (!healPressed && Medkits > 0)
+            {
                 healPressed = true;
                 Heal(100);
                 Medkits--;
                 Debug.Log("Healing");
             }
-        } else
+        }
+        else
         {
             healPressed = false;
         }
@@ -88,6 +91,7 @@ public class PlayerStats : MonoBehaviour
 
     public void Damage(float damage)
     {
+        postProcessingObject.ActivateDamageVignette();
         if (!isInvincible)
         {
             // Hit animation
@@ -148,9 +152,10 @@ public class PlayerStats : MonoBehaviour
         int usedAmmo = AmmoCapacity - quantity;
         if (Ammo >= usedAmmo)
         {
-            Ammo-=usedAmmo;
+            Ammo -= usedAmmo;
             return AmmoCapacity;
-        } else
+        }
+        else
         {
             int newClip = Ammo;
             Ammo = 0;
