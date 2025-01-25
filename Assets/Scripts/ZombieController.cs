@@ -226,6 +226,7 @@ public class ZombieController : MonoBehaviour
                 chaseCoroutine = null;
             }
             playerPosition = GameObject.FindGameObjectWithTag("Player").transform;
+            navMeshAgent.destination = playerPosition.position;
             Rotate(playerPosition.position);
             isChasing = true;
             isRoaming = false;
