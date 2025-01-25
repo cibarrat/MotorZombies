@@ -65,6 +65,7 @@ public class ZombieController : MonoBehaviour
 
     private void Update()
     {
+        animator.SetFloat("Speed", 0);
         if (debug)
         {
             canMoveText.text = $"canMove: {canMove}";
@@ -79,17 +80,19 @@ public class ZombieController : MonoBehaviour
         SeekPlayer();
         Moan();
         Walk();
-
+    
     }
 
     private void Walk()
     {
+        
         if (canMove && isChasing)
         {
+            navMeshAgent.speed = chaseSpeed;
             if (seesPlayer)
             {
-                animator.SetTrigger("IsRunning");
-                navMeshAgent.speed = chaseSpeed;
+                //animator.SetTrigger("IsRunning");
+                              
                 navMeshAgent.destination = playerPosition.position;
                 lastPlayerPosition = playerPosition.position;
                 //Rotate(navMeshAgent.destination + new Vector3(0, 1, 0), weakSpot.transform);
@@ -108,12 +111,18 @@ public class ZombieController : MonoBehaviour
             }
         }
         Roam();
+        if (canMove)
+        { 
+            animator.SetFloat("Speed", navMeshAgent.speed); 
+        }
+  
     }
     private void Roam()
     {
         if (canMove && canRoam && !isChasing && !isRoaming)
         {
-            animator.SetTrigger("IsRoam");//Roam/Walk animation
+            //animator.SetTrigger("IsRoam");//Roam/Walk animation
+            //animator.speed = navMeshAgent.speed;
             navMeshAgent.speed = speed;
             Vector3 randomPoint = GetRandomPoint(transform.position, roamDistance);
             navMeshAgent.destination = randomPoint;
@@ -158,7 +167,7 @@ public class ZombieController : MonoBehaviour
 
     void CastRayFromScreenPoint(Vector2 screenPoint)
     {
-        // Usa la cámara para convertir un punto en la pantalla a un rayo en el mundo
+        // Usa la cï¿½mara para convertir un punto en la pantalla a un rayo en el mundo
         Ray ray = sight.ScreenPointToRay(screenPoint);
 
         // Lanza el raycast y comprueba si golpea algo
@@ -212,6 +221,7 @@ public class ZombieController : MonoBehaviour
             HP -= damage;
             if (HP < 0)
             {
+                animator.SetTrigger("IsDead");
                 StopAllCoroutines();
                 chanceOfGrunt = 1;
                 canMove = false;
@@ -337,6 +347,7 @@ public class ZombieController : MonoBehaviour
 
     private IEnumerator IdleTimeout(float time)
     {
+       
         yield return new WaitForSeconds(time);
         canRoam = true;
     }
