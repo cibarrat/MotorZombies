@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Cinemachine;
 
 public class InGameSreens : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class InGameSreens : MonoBehaviour
     private GameObject canvasInstance;
     [SerializeField] private GameObject canvas;
     private Image pauseMenu;
+    private GameObject CamMovement;
+
+    private CinemachineVirtualCamera virtualCamera;
 
     private void Awake()
     {
@@ -23,11 +27,16 @@ public class InGameSreens : MonoBehaviour
         {
             canvasInstance = Instantiate(canvas);
         }
-        Transform imageTransform = canvasInstance.transform.Find("PauseMenu"); // Reemplaza "Imagen" por el nombre real de tu objeto
+        Transform imageTransform = canvasInstance.transform.Find("PauseMenu"); 
         if (imageTransform != null)
         {
             pauseMenu = imageTransform.GetComponent<Image>();
         }
+    }
+    void Start()
+    {
+        CamMovement = GameObject.Find("PlayerFollowCamera");
+        virtualCamera = CamMovement.GetComponent<CinemachineVirtualCamera>();
     }
     private void Update()
     {
@@ -48,16 +57,19 @@ public class InGameSreens : MonoBehaviour
     {
         Debug.Log("resume");
         Time.timeScale = 1f;
-        if(pauseMenu == null)
+        if (pauseMenu == null)
         {
             GameObject imageTransform = GameObject.Find("PauseMenu");
             pauseMenu = imageTransform.transform.GetComponent<Image>();
         }
+        GameObject CamMovement2 = GameObject.Find("PlayerFollowCamera");
+        CinemachineVirtualCamera virtualCamera2 = CamMovement2.GetComponent<CinemachineVirtualCamera>();
         pauseMenu.gameObject.SetActive(false);
+        virtualCamera2.enabled = true;
 
-        // Oculta y bloquea el cursor al reanudar
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
     }
 
     public void ChangeScene()
@@ -87,12 +99,12 @@ public class InGameSreens : MonoBehaviour
 
     private void PauseGame()
     {
+        virtualCamera.enabled = false;
         Debug.Log("pausado");
         pauseMenu.gameObject.SetActive(true);
         Time.timeScale = 0f;
         pauseAux = false;
 
-        // Desbloquea y muestra el cursor al pausar
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
