@@ -11,7 +11,6 @@ public class InGameSreens : MonoBehaviour
     private StarterAssetsInputs starterAssetsInputs;
     private ThirdPersonController thirdPersonController;
     private bool pauseAux;
-    public AudioSource actionSound;
     private GameObject canvasInstance;
     [SerializeField] private GameObject canvas;
     private Image pauseMenu;
@@ -23,11 +22,17 @@ public class InGameSreens : MonoBehaviour
     {
         starterAssetsInputs = GetComponent<StarterAssetsInputs>();
         thirdPersonController = GetComponent<ThirdPersonController>();
-        if (canvas != null)
+        if (GameObject.Find("CrosshairCanvas") == null)
         {
+            Debug.Log("Canvas era nulo");
             canvasInstance = Instantiate(canvas);
+            Debug.Log("Fue creado");
         }
-        Transform imageTransform = canvasInstance.transform.Find("PauseMenu"); 
+        else
+        {
+            canvasInstance = GameObject.Find("CrosshairCanvas");
+        }
+        Transform imageTransform = canvasInstance.transform.Find("PauseMenu");
         if (imageTransform != null)
         {
             pauseMenu = imageTransform.GetComponent<Image>();
@@ -75,27 +80,12 @@ public class InGameSreens : MonoBehaviour
     public void ChangeScene()
     {
         Time.timeScale = 1f;
-        if (actionSound != null)
-        {
-            actionSound.Play();
-            Debug.Log("entrta a if");
-            StartCoroutine(LoadSceneAfterSound(actionSound.clip.length));
-        }
-        else
-        {
-            SceneManager.LoadScene("Scenes/MainMenu");
-        }
+  
+        SceneManager.LoadScene("Scenes/MainMenu");
+        pauseMenu.gameObject.SetActive(false);
+
     }
 
-    private IEnumerator LoadSceneAfterSound(float delay)
-    {
-        Debug.Log("inicisa");
-        yield return new WaitForSeconds(delay);
-        Debug.Log("termina");
-        SceneManager.LoadScene("Scenes/MainMenu");
-        Debug.Log("casrga");
-        pauseMenu.gameObject.SetActive(false);
-    }
 
     private void PauseGame()
     {
