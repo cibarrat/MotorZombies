@@ -32,6 +32,7 @@ public class InGameSreens : MonoBehaviour
     {
         CamMovement = GameObject.Find("PlayerFollowCamera");
         virtualCamera = CamMovement.GetComponent<CinemachineVirtualCamera>();
+        Cursor.visible = false;
     }
     private void Update()
     {
